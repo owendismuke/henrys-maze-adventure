@@ -1,3 +1,4 @@
+import { Collision } from './Collision';
 import { gridToWorldCenter } from './Maze';
 import { Input } from './Input';
 import { MazeGenerator } from './MazeGenerator';
@@ -78,7 +79,10 @@ export class Game {
 
   private update(deltaSeconds: number): void {
     const movement = this.input.getMovementVector();
-    this.player.move(movement, deltaSeconds);
+    const delta = this.player.getMovementDelta(movement, deltaSeconds);
+    this.player.setCircle(
+      Collision.moveWithWalls(this.player.circle, this.maze, delta.x, delta.y),
+    );
   }
 
   private createPlayerAtStart(): Player {

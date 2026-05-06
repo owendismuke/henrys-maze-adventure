@@ -5,11 +5,22 @@ export const PLAYER_SPEED_PIXELS_PER_SECOND = 150;
 export class Player {
   constructor(public circle: Circle) {}
 
-  move(vector: GridPoint, deltaSeconds: number): void {
+  getMovementDelta(vector: GridPoint, deltaSeconds: number): GridPoint {
+    return {
+      x: vector.x * PLAYER_SPEED_PIXELS_PER_SECOND * deltaSeconds,
+      y: vector.y * PLAYER_SPEED_PIXELS_PER_SECOND * deltaSeconds,
+    };
+  }
+
+  moveBy(delta: GridPoint): void {
     this.circle = {
       ...this.circle,
-      x: this.circle.x + vector.x * PLAYER_SPEED_PIXELS_PER_SECOND * deltaSeconds,
-      y: this.circle.y + vector.y * PLAYER_SPEED_PIXELS_PER_SECOND * deltaSeconds,
+      x: this.circle.x + delta.x,
+      y: this.circle.y + delta.y,
     };
+  }
+
+  setCircle(circle: Circle): void {
+    this.circle = circle;
   }
 }

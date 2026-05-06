@@ -8,8 +8,9 @@ Original prompt: Build a complete, running MVP of a web-based maze game from an 
 - Implemented maze types, helper functions, path-first generation, and BFS difficulty validation.
 - Added Canvas 2D renderer and wired initial static maze view into the app.
 - Added held-key WASD/arrow input, normalized continuous player movement, and browser automation state/time hooks.
+- Added circle-vs-rectangle wall collision with axis-separated movement.
 
 ## TODO
 
-- Verify and commit movement.
-- Implement collision, win/restart, validation tests, README, and final verification.
+- Verify and commit collision.
+- Implement win/restart, validation tests, README, and final verification.
