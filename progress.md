@@ -6,8 +6,9 @@ Original prompt: Build a complete, running MVP of a web-based maze game from an 
 - Created minimal Vite/TypeScript scaffold with scripts for dev, build, preview, and test.
 - Added required docs as implementation source of truth.
 - Implemented maze types, helper functions, path-first generation, and BFS difficulty validation.
+- Added Canvas 2D renderer and wired initial static maze view into the app.
 
 ## TODO
 
-- Verify and commit maze generation.
-- Implement rendering, movement, collision, win/restart, validation tests, README, and final verification.
+- Verify and commit rendering.
+- Implement movement, collision, win/restart, validation tests, README, and final verification.
