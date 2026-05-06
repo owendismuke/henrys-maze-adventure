@@ -5,7 +5,7 @@
 1. Scaffold Vite, TypeScript, Vitest, base HTML/CSS, and git repository.
 2. Create product, architecture, task plan, and decision docs.
 3. Implement maze data structures, path-first generator, and validator.
-4. Implement canvas renderer for black background, white walls, blue player, and green goal.
+4. Implement canvas renderer for black background, white walls, player sprite, and green goal.
 5. Implement keyboard input and continuous player movement.
 6. Implement circle-vs-rectangle collision and wall blocking.
 7. Implement win detection, message, restart key, and restart button.
@@ -40,7 +40,7 @@
 
 - Maze appears on a black background.
 - Walls are white.
-- Player is a blue dot.
+- Player is rendered from the Henry sprite sheet.
 - Goal is green and visible.
 - Player starts at the entrance.
 - Player cannot pass through walls or clip through corners.

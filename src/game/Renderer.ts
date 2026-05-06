@@ -1,26 +1,30 @@
 import { gridToWorldCenter, mazePixelHeight, mazePixelWidth } from './Maze';
-import type { Circle, Maze } from './types';
+import { SpriteSheet } from './SpriteSheet';
+import type { Maze, PlayerRenderState } from './types';
 
 export interface RenderState {
   readonly maze: Maze;
-  readonly player: Circle;
+  readonly player: PlayerRenderState;
   readonly hasWon: boolean;
 }
 
 const COLORS = {
   background: '#000000',
   wall: '#ffffff',
-  player: '#1e88ff',
   goal: '#20c763',
   text: '#ffffff',
 } as const;
 
 export class Renderer {
   private readonly context: CanvasRenderingContext2D;
+  private readonly playerSprites: SpriteSheet;
   private boardOffsetX = 0;
   private boardOffsetY = 0;
 
-  constructor(private readonly canvas: HTMLCanvasElement) {
+  constructor(
+    private readonly canvas: HTMLCanvasElement,
+    onSpriteLoad: () => void,
+  ) {
     const context = canvas.getContext('2d');
 
     if (!context) {
@@ -28,6 +32,7 @@ export class Renderer {
     }
 
     this.context = context;
+    this.playerSprites = new SpriteSheet(onSpriteLoad);
   }
 
   render(state: RenderState): void {
@@ -94,17 +99,28 @@ export class Renderer {
     this.context.fill();
   }
 
-  private drawPlayer(player: Circle): void {
-    this.context.fillStyle = COLORS.player;
-    this.context.beginPath();
-    this.context.arc(
-      this.boardOffsetX + player.x,
-      this.boardOffsetY + player.y,
-      player.radius,
-      0,
-      Math.PI * 2,
+  private drawPlayer(player: PlayerRenderState): void {
+    const frame = this.playerSprites.getFrame(
+      player.facing,
+      player.isMoving,
+      player.animationSeconds,
     );
-    this.context.fill();
+
+    if (!frame) {
+      return;
+    }
+
+    const targetHeight = player.radius * 3.8;
+    const targetWidth = targetHeight * (frame.width / frame.height);
+
+    this.context.imageSmoothingEnabled = false;
+    this.context.drawImage(
+      frame.image,
+      this.boardOffsetX + player.x - targetWidth / 2,
+      this.boardOffsetY + player.y - targetHeight * 0.72,
+      targetWidth,
+      targetHeight,
+    );
   }
 
   private drawWinOverlay(maze: Maze): void {

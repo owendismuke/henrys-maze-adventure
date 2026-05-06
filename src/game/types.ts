@@ -18,6 +18,14 @@ export interface Circle {
   readonly radius: number;
 }
 
+export type FacingDirection = 'up' | 'down' | 'left' | 'right';
+
+export interface PlayerRenderState extends Circle {
+  readonly facing: FacingDirection;
+  readonly isMoving: boolean;
+  readonly animationSeconds: number;
+}
+
 export interface Maze {
   readonly width: number;
   readonly height: number;

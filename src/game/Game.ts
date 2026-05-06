@@ -4,7 +4,7 @@ import { Input } from './Input';
 import { MazeGenerator } from './MazeGenerator';
 import { Player } from './Player';
 import { Renderer } from './Renderer';
-import type { Maze } from './types';
+import type { FacingDirection, Maze } from './types';
 
 const PLAYER_RADIUS_RATIO = 0.24;
 const GOAL_RADIUS_RATIO = 0.28;
@@ -18,6 +18,9 @@ export class Game {
   private readonly renderer: Renderer;
   private maze: Maze;
   private player: Player;
+  private playerFacing: FacingDirection = 'down';
+  private playerIsMoving = false;
+  private animationSeconds = 0;
   private hasWon = false;
   private animationFrame = 0;
   private lastFrameTime = performance.now();
@@ -26,7 +29,7 @@ export class Game {
     canvas: HTMLCanvasElement,
     private readonly onStateChange: (snapshot: GameStateSnapshot) => void = () => undefined,
   ) {
-    this.renderer = new Renderer(canvas);
+    this.renderer = new Renderer(canvas, this.render);
     this.maze = new MazeGenerator().generate();
     this.player = this.createPlayerAtStart();
   }
@@ -73,7 +76,12 @@ export class Game {
   render = (): void => {
     this.renderer.render({
       maze: this.maze,
-      player: this.player.circle,
+      player: {
+        ...this.player.circle,
+        facing: this.playerFacing,
+        isMoving: this.playerIsMoving,
+        animationSeconds: this.animationSeconds,
+      },
       hasWon: this.hasWon,
     });
   };
@@ -96,6 +104,13 @@ export class Game {
 
     this.input.consumeRestart();
     const movement = this.input.getMovementVector();
+    this.playerIsMoving = Math.hypot(movement.x, movement.y) > 0;
+
+    if (this.playerIsMoving) {
+      this.playerFacing = getFacingDirection(movement, this.playerFacing);
+      this.animationSeconds += deltaSeconds;
+    }
+
     const delta = this.player.getMovementDelta(movement, deltaSeconds);
     this.player.setCircle(
       Collision.moveWithWalls(this.player.circle, this.maze, delta.x, delta.y),
@@ -115,6 +130,9 @@ export class Game {
   restart(): void {
     this.maze = new MazeGenerator().generate();
     this.player = this.createPlayerAtStart();
+    this.playerFacing = 'down';
+    this.playerIsMoving = false;
+    this.animationSeconds = 0;
     this.setWon(false);
     this.render();
   }
@@ -140,4 +158,19 @@ export class Game {
     this.hasWon = hasWon;
     this.onStateChange({ hasWon });
   }
+}
+
+function getFacingDirection(
+  movement: { readonly x: number; readonly y: number },
+  current: FacingDirection,
+): FacingDirection {
+  if (Math.abs(movement.x) > Math.abs(movement.y)) {
+    return movement.x > 0 ? 'right' : 'left';
+  }
+
+  if (Math.abs(movement.y) > 0) {
+    return movement.y > 0 ? 'down' : 'up';
+  }
+
+  return current;
 }

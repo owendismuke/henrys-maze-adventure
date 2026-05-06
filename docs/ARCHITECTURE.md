@@ -43,7 +43,9 @@
 
 ## Rendering Strategy
 
-`Renderer` draws the full game to one canvas. It computes a fixed logical board from maze dimensions and tile size, centers the board in the viewport, fills the canvas black, draws wall tiles white, draws the goal green, draws the player blue, and overlays a simple win message.
+`Renderer` draws the full game to one canvas. It computes a fixed logical board from maze dimensions and tile size, centers the board in the viewport, fills the canvas black, draws wall tiles white, draws the goal green, draws Henry from `sprites/henry.png`, and overlays a simple win message.
+
+`SpriteSheet` loads the Henry sprite sheet, crops the standing and walking frames, keys out the dark source background, caches processed frames, and returns direction-aware frames for the renderer.
 
 ## Input Handling
 
@@ -51,7 +53,7 @@
 
 ## Collision Approach
 
-The player is a circle and walls are axis-aligned rectangles. Movement is continuous. The player moves one axis at a time so blocked diagonal movement can still slide along open walls. Collision uses circle-vs-rectangle checks against nearby wall tiles, including corners, to prevent clipping.
+The player is rendered as Henry but still collides as a circle, and walls are axis-aligned rectangles. Movement is continuous. The player moves one axis at a time so blocked diagonal movement can still slide along open walls. Collision uses circle-vs-rectangle checks against nearby wall tiles, including corners, to prevent clipping.
 
 ## Maze Generation Strategy
 

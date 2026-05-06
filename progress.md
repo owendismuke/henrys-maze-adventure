@@ -15,6 +15,7 @@ Original prompt: Build a complete, running MVP of a web-based maze game from an 
 - Browser client rendered screenshots and state successfully with no console errors; added tile grid to debug state for complete solve-path verification.
 - Final verification passed: npm install, npm test, npm run build, npm run preview startup, browser screenshot/state client, and complete solve-flow Playwright script.
 - Updated generator/validator so every generated maze has exactly one start-to-goal path, and removed the gray win overlay to preserve the black background.
+- Swapped blue-dot rendering for cached frames from `sprites/henry.png`; collision remains circle-based.
 
 ## TODO
 

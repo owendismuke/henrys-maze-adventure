@@ -2,7 +2,7 @@
 
 A browser-playable top-down maze game built with Vite, TypeScript, and plain Canvas 2D.
 
-The player is a blue dot, the maze walls are white, the background is black, and the goal is green. Mazes are generated from a guaranteed start-to-goal path, kept to exactly one correct route, then validated with BFS and child-friendly difficulty constraints.
+The player is rendered from `sprites/henry.png`, the maze walls are white, the background is black, and the goal is green. Mazes are generated from a guaranteed start-to-goal path, kept to exactly one correct route, then validated with BFS and child-friendly difficulty constraints.
 
 ## Install
 
@@ -51,7 +51,7 @@ Tests cover deterministic maze validity, unique solution validation, child-frien
 
 - Single-player only.
 - Desktop keyboard controls only.
-- No sound, level selection, scoring, timer, persistence, or external art.
+- No sound, level selection, scoring, timer, persistence, or art beyond the local Henry sprite sheet.
 - Maze size and difficulty are fixed for the MVP.
 
 ## Future Improvements

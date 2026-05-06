@@ -14,3 +14,5 @@
 - Measure solution length in rendered tile steps. A 7 by 7 cell maze has connector tiles between cells, so the child-friendly accepted range is 19 to 31 rendered tile steps.
 - Preserve a single correct path by tracking explicit carved edges. Adjacent carved cells stay separated by walls unless the generator carved that exact edge, which prevents side branches from forming loops or alternate routes.
 - Remove the gray win overlay. The page and canvas should remain fully black except for white maze walls and required game elements/text.
+- Use `sprites/henry.png` for the player model. Collision remains circle-based, while rendering crops the sprite sheet and keys out the dark source background so the character appears directly on the maze.
+- Cache processed sprite frames in memory. Chroma-keying the source frame every render would be wasteful, while cached frames keep the render loop simple.
