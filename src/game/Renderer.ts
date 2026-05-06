@@ -15,8 +15,11 @@ export interface RenderState {
 const COLORS = {
   background: '#000000',
 } as const;
-const MIN_BOARD_TOP_OFFSET = 126;
-const TIMER_PANEL_TOP = 62;
+const UI_PADDING = 18;
+const MIN_BOARD_TOP_OFFSET = 94;
+const TIMER_PANEL_WIDTH = 146;
+const DOOR_SIZE_RATIO = 2.35;
+const DOOR_TOP_GAP = 4;
 
 export class Renderer {
   private readonly context: CanvasRenderingContext2D;
@@ -66,9 +69,10 @@ export class Renderer {
 
   private computeBoardOffset(maze: Maze): void {
     this.boardOffsetX = Math.floor((this.canvas.width - mazePixelWidth(maze)) / 2);
-    const centeredY = Math.floor((this.canvas.height - mazePixelHeight(maze)) / 2);
+    const visualHeight = mazePixelHeight(maze) + maze.cellSize * DOOR_SIZE_RATIO + DOOR_TOP_GAP;
+    const centeredY = Math.floor((this.canvas.height - visualHeight) / 2);
     this.boardOffsetY =
-      mazePixelHeight(maze) + MIN_BOARD_TOP_OFFSET <= this.canvas.height
+      visualHeight + MIN_BOARD_TOP_OFFSET <= this.canvas.height
         ? Math.max(centeredY, MIN_BOARD_TOP_OFFSET)
         : centeredY;
   }
@@ -114,8 +118,8 @@ export class Renderer {
     this.mainAtlas.drawDoor(
       this.context,
       this.boardOffsetX + center.x,
-      this.boardOffsetY + center.y,
-      maze.cellSize * 2.35,
+      this.boardOffsetY + mazePixelHeight(maze) + DOOR_TOP_GAP,
+      maze.cellSize * DOOR_SIZE_RATIO,
     );
   }
 
@@ -146,8 +150,8 @@ export class Renderer {
   private drawTimer(elapsedSeconds: number): void {
     this.mainAtlas.drawTimerPanel(
       this.context,
-      this.canvas.width / 2,
-      TIMER_PANEL_TOP,
+      this.canvas.width - TIMER_PANEL_WIDTH - UI_PADDING,
+      UI_PADDING,
       formatTimer(elapsedSeconds),
     );
   }

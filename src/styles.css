@@ -54,11 +54,10 @@ body {
 
 #character-selector {
   position: absolute;
-  left: 50%;
+  left: 18px;
   top: 18px;
   display: flex;
   gap: 8px;
-  transform: translateX(-50%);
 }
 
 #character-selector button {

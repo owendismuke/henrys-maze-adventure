@@ -24,49 +24,6 @@ const CROPS = {
   timerPanel: { x: 678, y: 1446, width: 112, height: 42 },
 } as const satisfies Record<string, Crop>;
 
-const DIGIT_CROPS: Record<string, Crop> = {
-  '0': { x: 18, y: 100, width: 38, height: 55 },
-  '1': { x: 70, y: 100, width: 34, height: 55 },
-  '2': { x: 118, y: 100, width: 38, height: 55 },
-  '3': { x: 170, y: 100, width: 38, height: 55 },
-  '4': { x: 218, y: 100, width: 38, height: 55 },
-  '5': { x: 18, y: 171, width: 38, height: 55 },
-  '6': { x: 70, y: 171, width: 38, height: 55 },
-  '7': { x: 118, y: 171, width: 38, height: 55 },
-  '8': { x: 170, y: 171, width: 38, height: 55 },
-  '9': { x: 218, y: 171, width: 38, height: 55 },
-  ':': { x: 258, y: 133, width: 24, height: 24 },
-};
-
-const LETTER_CROPS: Record<string, Crop> = {
-  A: { x: 318, y: 98, width: 34, height: 44 },
-  B: { x: 357, y: 98, width: 34, height: 44 },
-  C: { x: 396, y: 98, width: 34, height: 44 },
-  D: { x: 435, y: 98, width: 34, height: 44 },
-  E: { x: 474, y: 98, width: 34, height: 44 },
-  F: { x: 513, y: 98, width: 34, height: 44 },
-  G: { x: 552, y: 98, width: 34, height: 44 },
-  H: { x: 591, y: 98, width: 34, height: 44 },
-  I: { x: 630, y: 98, width: 28, height: 44 },
-  J: { x: 318, y: 151, width: 34, height: 44 },
-  K: { x: 357, y: 151, width: 34, height: 44 },
-  L: { x: 396, y: 151, width: 34, height: 44 },
-  M: { x: 435, y: 151, width: 34, height: 44 },
-  N: { x: 474, y: 151, width: 34, height: 44 },
-  O: { x: 513, y: 151, width: 34, height: 44 },
-  P: { x: 552, y: 151, width: 34, height: 44 },
-  Q: { x: 591, y: 151, width: 34, height: 44 },
-  R: { x: 630, y: 151, width: 34, height: 44 },
-  S: { x: 318, y: 204, width: 34, height: 44 },
-  T: { x: 357, y: 204, width: 34, height: 44 },
-  U: { x: 396, y: 204, width: 34, height: 44 },
-  V: { x: 435, y: 204, width: 34, height: 44 },
-  W: { x: 474, y: 204, width: 34, height: 44 },
-  X: { x: 513, y: 204, width: 34, height: 44 },
-  Y: { x: 552, y: 204, width: 34, height: 44 },
-  Z: { x: 591, y: 204, width: 34, height: 44 },
-};
-
 export class MainSpriteAtlas {
   private readonly image = new Image();
   private readonly cache = new Map<string, HTMLCanvasElement>();
@@ -96,106 +53,62 @@ export class MainSpriteAtlas {
     this.drawCutout(context, `wall-${kind}`, crop, x, y, size, size, rotationRadians);
   }
 
-  drawDoor(context: CanvasRenderingContext2D, centerX: number, centerY: number, size: number): void {
+  drawDoor(context: CanvasRenderingContext2D, centerX: number, topY: number, size: number): void {
     this.drawCutout(
       context,
       'door',
       CROPS.door,
       centerX - size / 2,
-      centerY - size * 0.78,
+      topY,
       size,
       size,
     );
   }
 
-  drawTimerPanel(context: CanvasRenderingContext2D, centerX: number, y: number, text: string): void {
-    const panelWidth = 128;
-    const panelHeight = 48;
-    const x = centerX - panelWidth / 2;
+  drawTimerPanel(context: CanvasRenderingContext2D, x: number, y: number, text: string): void {
+    const panelWidth = 146;
+    const panelHeight = 54;
     this.drawRaw(context, 'timerPanel', CROPS.timerPanel, x, y, panelWidth, panelHeight);
     context.fillStyle = '#0f2657';
-    context.fillRect(x + 37, y + 20, 56, 18);
-    this.drawDigits(context, text, centerX, y + 22, 0.36);
+    context.fillRect(x + 29, y + 8, 88, 35);
+    context.textAlign = 'center';
+    context.textBaseline = 'middle';
+    context.fillStyle = '#d9f230';
+    context.font = '700 10px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
+    context.fillText('TIME', x + panelWidth / 2, y + 15);
+    context.fillStyle = '#ffd21d';
+    context.strokeStyle = '#17305d';
+    context.lineWidth = 3;
+    context.font = '800 20px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
+    context.strokeText(text, x + panelWidth / 2, y + 32);
+    context.fillText(text, x + panelWidth / 2, y + 32);
   }
 
   drawWinText(context: CanvasRenderingContext2D, centerX: number, centerY: number): void {
-    context.fillStyle = 'rgba(0, 0, 0, 0.68)';
-    context.fillRect(centerX - 146, centerY - 46, 292, 86);
-    this.drawText(context, 'YOU WIN', centerX, centerY - 34, 0.9);
-    this.drawText(context, 'PRESS R ENTER', centerX, centerY + 12, 0.54);
-  }
-
-  private drawDigits(
-    context: CanvasRenderingContext2D,
-    text: string,
-    centerX: number,
-    y: number,
-    scale: number,
-  ): void {
-    const widths = [...text].map((character) => {
-      const crop = DIGIT_CROPS[character];
-      return character === ':' ? 16 * scale : crop ? crop.width * scale : 10 * scale;
-    });
-    const totalWidth = widths.reduce((total, width) => total + width, 0);
-    let x = centerX - totalWidth / 2;
-
-    [...text].forEach((character, index) => {
-      const crop = DIGIT_CROPS[character];
-      if (crop) {
-        if (character === ':') {
-          const dotSize = Math.max(2, 7 * scale);
-          context.fillStyle = '#ffd21d';
-          context.fillRect(x + 5 * scale, y + 10 * scale, dotSize, dotSize);
-          context.fillRect(x + 5 * scale, y + 27 * scale, dotSize, dotSize);
-        } else {
-          this.drawCutout(
-            context,
-            `digit-${character}`,
-            crop,
-            x,
-            y,
-            crop.width * scale,
-            crop.height * scale,
-          );
-        }
-      }
-      x += widths[index];
-    });
-  }
-
-  private drawText(
-    context: CanvasRenderingContext2D,
-    text: string,
-    centerX: number,
-    y: number,
-    scale: number,
-  ): void {
-    const spacing = 7 * scale;
-    const spaceWidth = 18 * scale;
-    const glyphs = [...text].map((character) => LETTER_CROPS[character] ?? null);
-    const totalWidth = glyphs.reduce((total, crop) => {
-      return total + (crop ? crop.width * scale + spacing : spaceWidth);
-    }, 0);
-    let x = centerX - totalWidth / 2;
-
-    [...text].forEach((character, index) => {
-      const crop = glyphs[index];
-      if (!crop) {
-        x += spaceWidth;
-        return;
-      }
-
-      this.drawCutout(
-        context,
-        `letter-${character}`,
-        crop,
-        x,
-        y,
-        crop.width * scale,
-        crop.height * scale,
-      );
-      x += crop.width * scale + spacing;
-    });
+    const bannerWidth = 270;
+    const bannerHeight = 86;
+    context.fillStyle = 'rgba(0, 0, 0, 0.82)';
+    context.fillRect(centerX - bannerWidth / 2, centerY - bannerHeight / 2, bannerWidth, bannerHeight);
+    context.strokeStyle = '#ffffff';
+    context.lineWidth = 3;
+    context.strokeRect(
+      centerX - bannerWidth / 2,
+      centerY - bannerHeight / 2,
+      bannerWidth,
+      bannerHeight,
+    );
+    context.textAlign = 'center';
+    context.textBaseline = 'middle';
+    context.strokeStyle = '#17305d';
+    context.lineWidth = 4;
+    context.fillStyle = '#ffd21d';
+    context.font = '800 32px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
+    context.strokeText('YOU WIN!', centerX, centerY - 16);
+    context.fillText('YOU WIN!', centerX, centerY - 16);
+    context.lineWidth = 3;
+    context.font = '800 15px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
+    context.strokeText('PRESS R OR ENTER', centerX, centerY + 22);
+    context.fillText('PRESS R OR ENTER', centerX, centerY + 22);
   }
 
   private drawRaw(

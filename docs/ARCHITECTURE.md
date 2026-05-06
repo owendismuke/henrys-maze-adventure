@@ -45,11 +45,11 @@
 
 ## Rendering Strategy
 
-`Renderer` draws the full game to one canvas. It computes a fixed logical board from maze dimensions and tile size, centers the board in the viewport, fills the canvas black, draws dirt floor tiles, draws grassy wall connector sprites, draws the door goal, draws the selected character sprite, draws the timer HUD, and overlays spritesheet win text.
+`Renderer` draws the full game to one canvas. It computes a fixed logical board from maze dimensions and tile size, centers the board below the top UI padding, fills the canvas black, draws dirt floor tiles, draws grassy wall connector sprites, draws the door below the exit, draws the selected character sprite, draws the top-right timer HUD, and overlays a backed win banner.
 
 `SpriteSheet` loads Henry and Tofu sprite sheets, crops the standing and walking frames using per-character sheet config, removes each sheet's source background, caches processed frames, and returns direction-aware frames for the renderer.
 
-`MainSpriteAtlas` loads `sprites/main.png`, caches named crop regions, and draws the grassy maze theme, door goal, timer panel, digit glyphs, and alphabet glyphs. It removes dark source-sheet background for cutout sprites while keeping floor textures raw.
+`MainSpriteAtlas` loads `sprites/main.png`, caches named crop regions, and draws the grassy maze theme, door goal, and timer panel. Timer and win text use backed canvas text over sprite panels to avoid the clipping/artifact issues in the atlas glyph regions.
 
 ## Input Handling
 

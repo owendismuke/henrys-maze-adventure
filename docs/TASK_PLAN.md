@@ -36,6 +36,7 @@
 - Browser automation verifies wall collision blocks traversal.
 - Browser automation verifies win and restart flow.
 - Browser automation verifies timer starts on movement and stops on win.
+- Browser automation verifies top-left selector, top-right timer, below-exit door, and unclipped win banner.
 
 ## Manual QA Checklist
 
@@ -46,5 +47,5 @@
 - Player starts at the entrance.
 - Player cannot pass through walls or clip through corners.
 - Maze has a visibly more complex 10 by 10 orthogonal layout with one correct solution.
-- Spritesheet win text appears on goal reach.
+- Backed win banner appears on goal reach without clipping.
 - `R`, `Enter`, and the restart button restart after winning.

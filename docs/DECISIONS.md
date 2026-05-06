@@ -28,3 +28,6 @@
 - Reserve a top offset for the centered maze board when viewport height allows it. This keeps the character selector from touching the denser 10 by 10 maze in smaller browser viewports.
 - Use `sprites/main.png` as a visual atlas for the maze, goal, timer, and canvas text. The selected theme is grassy walls with dirt paths because fully grassy walls and floors were too low-contrast in browser verification.
 - Keep the stopwatch deterministic and game-owned. It starts on first movement, advances through the existing update loop and `advanceTime`, stops on win, and resets on restart.
+- Place the character selector in the top-left and the timer in the top-right. This separates the UI controls from each other and from the centered maze board.
+- Draw the door below the exit instead of on top of the maze. The collision goal remains at the exit tile, while the door is a visual destination just outside the board.
+- Use clean backed canvas text for the timer numerals and win banner. The sprite atlas glyph regions produced visible artifacts and clipping at the sizes needed in-game.

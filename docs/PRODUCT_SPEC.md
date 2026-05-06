@@ -29,7 +29,7 @@ The game should be immediately understandable. A child can see the maze, selecte
 
 ## Win Condition
 
-The player wins when the selected character overlaps the door at the exit. On win, the game displays spritesheet text for "YOU WIN" and supports restart by pressing `R`, `Enter`, or clicking the restart button.
+The player wins when the selected character overlaps the exit at the door. On win, the game displays a backed "YOU WIN!" banner and supports restart by pressing `R`, `Enter`, or clicking the restart button.
 
 ## Controls
 
@@ -45,8 +45,9 @@ Holding movement keys continuously moves the player. Arrow key browser scrolling
 
 - Full black canvas/page background
 - Grassy maze walls and dirt floor path textures from `sprites/main.png`, with the maze board centered smaller than the page
-- Character selector for Henry or Tofu
+- Character selector for Henry or Tofu in the top-left corner
 - Henry sprite from `sprites/henry.png`
 - Tofu sprite from `sprites/tofu.png`
-- Door goal, timer panel, stopwatch numbers, and bitmap win text from `sprites/main.png`
+- Door goal below the maze exit, with the maze path leading to it
+- Timer panel in the top-right corner with clean high-contrast stopwatch text
 - Stopwatch starts on first movement and stops when the player reaches the door
