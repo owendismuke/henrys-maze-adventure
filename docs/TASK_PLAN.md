@@ -40,7 +40,7 @@
 
 - Maze appears on a black background.
 - Walls are white.
-- Player is rendered from the Henry sprite sheet.
+- Player is rendered from the selected Henry or Tofu sprite sheet.
 - Goal is green and visible.
 - Player starts at the entrance.
 - Player cannot pass through walls or clip through corners.

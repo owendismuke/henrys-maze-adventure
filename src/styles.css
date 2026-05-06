@@ -52,6 +52,29 @@ body {
   cursor: pointer;
 }
 
+#character-selector {
+  position: absolute;
+  left: 50%;
+  top: 18px;
+  display: flex;
+  gap: 8px;
+  transform: translateX(-50%);
+}
+
+#character-selector button {
+  min-width: 82px;
+  min-height: 36px;
+  border: 2px solid #fff;
+  border-radius: 6px;
+  background: #000;
+  color: #fff;
+  font: 700 0.9rem system-ui, sans-serif;
+  cursor: pointer;
+}
+
+#character-selector button.selected,
+#character-selector button:hover,
+#character-selector button:focus-visible,
 #restart-button:hover,
 #restart-button:focus-visible {
   background: #fff;

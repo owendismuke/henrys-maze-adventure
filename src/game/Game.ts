@@ -4,7 +4,7 @@ import { Input } from './Input';
 import { MazeGenerator } from './MazeGenerator';
 import { Player } from './Player';
 import { Renderer } from './Renderer';
-import type { FacingDirection, Maze } from './types';
+import type { CharacterId, FacingDirection, Maze } from './types';
 
 const PLAYER_RADIUS_RATIO = 0.24;
 const GOAL_RADIUS_RATIO = 0.28;
@@ -18,6 +18,7 @@ export class Game {
   private readonly renderer: Renderer;
   private maze: Maze;
   private player: Player;
+  private selectedCharacter: CharacterId = 'henry';
   private playerFacing: FacingDirection = 'down';
   private playerIsMoving = false;
   private animationSeconds = 0;
@@ -69,7 +70,10 @@ export class Game {
         goal: this.maze.goal,
         tiles: this.maze.tiles,
       },
-      player: this.player.circle,
+      player: {
+        ...this.player.circle,
+        character: this.selectedCharacter,
+      },
     });
   }
 
@@ -78,6 +82,7 @@ export class Game {
       maze: this.maze,
       player: {
         ...this.player.circle,
+        character: this.selectedCharacter,
         facing: this.playerFacing,
         isMoving: this.playerIsMoving,
         animationSeconds: this.animationSeconds,
@@ -134,6 +139,11 @@ export class Game {
     this.playerIsMoving = false;
     this.animationSeconds = 0;
     this.setWon(false);
+    this.render();
+  }
+
+  setCharacter(character: CharacterId): void {
+    this.selectedCharacter = character;
     this.render();
   }
 

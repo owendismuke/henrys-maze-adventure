@@ -16,3 +16,4 @@
 - Remove the gray win overlay. The page and canvas should remain fully black except for white maze walls and required game elements/text.
 - Use `sprites/henry.png` for the player model. Collision remains circle-based, while rendering crops the sprite sheet and keys out the dark source background so the character appears directly on the maze.
 - Cache processed sprite frames in memory. Chroma-keying the source frame every render would be wasteful, while cached frames keep the render loop simple.
+- Add Tofu as a selectable character using the same collision body and renderer path as Henry. Tofu's sheet uses a different source layout and background, so the sprite config supports per-character crop and background-removal strategy.

@@ -2,7 +2,7 @@
 
 A browser-playable top-down maze game built with Vite, TypeScript, and plain Canvas 2D.
 
-The player is rendered from `sprites/henry.png`, the maze walls are white, the background is black, and the goal is green. Mazes are generated from a guaranteed start-to-goal path, kept to exactly one correct route, then validated with BFS and child-friendly difficulty constraints.
+The player can choose Henry or Tofu, the maze walls are white, the background is black, and the goal is green. Mazes are generated from a guaranteed start-to-goal path, kept to exactly one correct route, then validated with BFS and child-friendly difficulty constraints.
 
 ## Install
 
@@ -46,12 +46,13 @@ Tests cover deterministic maze validity, unique solution validation, child-frien
 - `D` or `ArrowRight`: move right
 - `R` or `Enter`: restart after winning
 - Restart button: restart after winning
+- Henry / Tofu buttons: switch player character
 
 ## MVP Limitations
 
 - Single-player only.
 - Desktop keyboard controls only.
-- No sound, level selection, scoring, timer, persistence, or art beyond the local Henry sprite sheet.
+- No sound, level selection, scoring, timer, persistence, or art beyond the local character sprite sheets.
 - Maze size and difficulty are fixed for the MVP.
 
 ## Future Improvements

@@ -1,6 +1,6 @@
 import { gridToWorldCenter, mazePixelHeight, mazePixelWidth } from './Maze';
-import { SpriteSheet } from './SpriteSheet';
-import type { Maze, PlayerRenderState } from './types';
+import { createCharacterSpriteSheets, type SpriteSheet } from './SpriteSheet';
+import type { CharacterId, Maze, PlayerRenderState } from './types';
 
 export interface RenderState {
   readonly maze: Maze;
@@ -17,7 +17,7 @@ const COLORS = {
 
 export class Renderer {
   private readonly context: CanvasRenderingContext2D;
-  private readonly playerSprites: SpriteSheet;
+  private readonly playerSprites: Record<CharacterId, SpriteSheet>;
   private boardOffsetX = 0;
   private boardOffsetY = 0;
 
@@ -32,7 +32,7 @@ export class Renderer {
     }
 
     this.context = context;
-    this.playerSprites = new SpriteSheet(onSpriteLoad);
+    this.playerSprites = createCharacterSpriteSheets(onSpriteLoad);
   }
 
   render(state: RenderState): void {
@@ -100,7 +100,7 @@ export class Renderer {
   }
 
   private drawPlayer(player: PlayerRenderState): void {
-    const frame = this.playerSprites.getFrame(
+    const frame = this.playerSprites[player.character].getFrame(
       player.facing,
       player.isMoving,
       player.animationSeconds,
@@ -110,7 +110,7 @@ export class Renderer {
       return;
     }
 
-    const targetHeight = player.radius * 3.8;
+    const targetHeight = player.radius * (player.character === 'tofu' ? 4.6 : 3.8);
     const targetWidth = targetHeight * (frame.width / frame.height);
 
     this.context.imageSmoothingEnabled = false;

@@ -19,8 +19,10 @@ export interface Circle {
 }
 
 export type FacingDirection = 'up' | 'down' | 'left' | 'right';
+export type CharacterId = 'henry' | 'tofu';
 
 export interface PlayerRenderState extends Circle {
+  readonly character: CharacterId;
   readonly facing: FacingDirection;
   readonly isMoving: boolean;
   readonly animationSeconds: number;

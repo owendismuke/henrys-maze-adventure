@@ -1,13 +1,11 @@
 import henrySpriteUrl from '../../sprites/henry.png';
-import type { FacingDirection } from './types';
+import tofuSpriteUrl from '../../sprites/tofu.png';
+import type { CharacterId, FacingDirection } from './types';
 
-const FRAME_SOURCE_X = 384;
-const FRAME_SOURCE_Y = 0;
-const FRAME_WIDTH = 224;
-const FRAME_HEIGHT = 204;
 const FRAME_COLUMNS = [0, 1, 2, 3] as const;
 const DARK_BACKGROUND_THRESHOLD = 42;
 const EDGE_SAMPLE_PADDING = 2;
+const EDGE_BACKGROUND_TOLERANCE = 58;
 
 const ROW_BY_DIRECTION: Record<FacingDirection | 'standing', number> = {
   standing: 0,
@@ -15,6 +13,36 @@ const ROW_BY_DIRECTION: Record<FacingDirection | 'standing', number> = {
   down: 2,
   left: 3,
   right: 4,
+};
+
+type BackgroundRemoval = 'dark' | 'edge-connected';
+
+interface SpriteSheetConfig {
+  readonly url: string;
+  readonly sourceX: number;
+  readonly sourceY: number;
+  readonly frameWidth: number;
+  readonly frameHeight: number;
+  readonly backgroundRemoval: BackgroundRemoval;
+}
+
+const CHARACTER_SHEETS: Record<CharacterId, SpriteSheetConfig> = {
+  henry: {
+    url: henrySpriteUrl,
+    sourceX: 384,
+    sourceY: 0,
+    frameWidth: 224,
+    frameHeight: 204,
+    backgroundRemoval: 'dark',
+  },
+  tofu: {
+    url: tofuSpriteUrl,
+    sourceX: 320,
+    sourceY: 0,
+    frameWidth: 256,
+    frameHeight: 204,
+    backgroundRemoval: 'edge-connected',
+  },
 };
 
 export interface SpriteFrame {
@@ -28,8 +56,11 @@ export class SpriteSheet {
   private readonly frameCache = new Map<string, SpriteFrame>();
   private isReady = false;
 
-  constructor(private readonly onLoad: () => void) {
-    this.image.src = henrySpriteUrl;
+  constructor(
+    private readonly config: SpriteSheetConfig,
+    private readonly onLoad: () => void,
+  ) {
+    this.image.src = config.url;
     this.image.onload = () => {
       this.isReady = true;
       this.onLoad();
@@ -61,8 +92,8 @@ export class SpriteSheet {
     }
 
     const rawCanvas = document.createElement('canvas');
-    rawCanvas.width = FRAME_WIDTH;
-    rawCanvas.height = FRAME_HEIGHT;
+    rawCanvas.width = this.config.frameWidth;
+    rawCanvas.height = this.config.frameHeight;
 
     const context = rawCanvas.getContext('2d');
     if (!context) {
@@ -71,35 +102,18 @@ export class SpriteSheet {
 
     context.drawImage(
       this.image,
-      FRAME_SOURCE_X + column * FRAME_WIDTH,
-      FRAME_SOURCE_Y + row * FRAME_HEIGHT,
-      FRAME_WIDTH,
-      FRAME_HEIGHT,
+      this.config.sourceX + column * this.config.frameWidth,
+      this.config.sourceY + row * this.config.frameHeight,
+      this.config.frameWidth,
+      this.config.frameHeight,
       0,
       0,
-      FRAME_WIDTH,
-      FRAME_HEIGHT,
+      this.config.frameWidth,
+      this.config.frameHeight,
     );
 
-    const imageData = context.getImageData(0, 0, FRAME_WIDTH, FRAME_HEIGHT);
-    const data = imageData.data;
-
-    for (let index = 0; index < data.length; index += 4) {
-      const pixel = index / 4;
-      const x = pixel % FRAME_WIDTH;
-      const y = Math.floor(pixel / FRAME_WIDTH);
-      const red = data[index];
-      const green = data[index + 1];
-      const blue = data[index + 2];
-
-      if (
-        isDarkBackground(red, green, blue) ||
-        isFrameEdge(x, y, FRAME_WIDTH, FRAME_HEIGHT)
-      ) {
-        data[index + 3] = 0;
-      }
-    }
-
+    const imageData = context.getImageData(0, 0, this.config.frameWidth, this.config.frameHeight);
+    removeBackground(imageData, this.config.backgroundRemoval);
     context.putImageData(imageData, 0, 0);
 
     const bounds = findOpaqueBounds(imageData);
@@ -136,12 +150,169 @@ export class SpriteSheet {
 
     const frame = {
       image: rawCanvas,
-      width: FRAME_WIDTH,
-      height: FRAME_HEIGHT,
+      width: this.config.frameWidth,
+      height: this.config.frameHeight,
     };
     this.frameCache.set(cacheKey, frame);
     return frame;
   }
+}
+
+export function createCharacterSpriteSheets(onLoad: () => void): Record<CharacterId, SpriteSheet> {
+  return {
+    henry: new SpriteSheet(CHARACTER_SHEETS.henry, onLoad),
+    tofu: new SpriteSheet(CHARACTER_SHEETS.tofu, onLoad),
+  };
+}
+
+function removeBackground(imageData: ImageData, mode: BackgroundRemoval): void {
+  if (mode === 'dark') {
+    removeDarkBackground(imageData);
+    return;
+  }
+
+  removeEdgeConnectedBackground(imageData);
+  keepLargestOpaqueComponent(imageData);
+}
+
+function removeDarkBackground(imageData: ImageData): void {
+  const data = imageData.data;
+
+  for (let index = 0; index < data.length; index += 4) {
+    const pixel = index / 4;
+    const x = pixel % imageData.width;
+    const y = Math.floor(pixel / imageData.width);
+    const red = data[index];
+    const green = data[index + 1];
+    const blue = data[index + 2];
+
+    if (isDarkBackground(red, green, blue) || isFrameEdge(x, y, imageData.width, imageData.height)) {
+      data[index + 3] = 0;
+    }
+  }
+}
+
+function removeEdgeConnectedBackground(imageData: ImageData): void {
+  const data = imageData.data;
+  const visited = new Uint8Array(imageData.width * imageData.height);
+  const queue: number[] = [];
+
+  for (let x = 0; x < imageData.width; x += 1) {
+    queue.push(x, (imageData.height - 1) * imageData.width + x);
+  }
+
+  for (let y = 1; y < imageData.height - 1; y += 1) {
+    queue.push(y * imageData.width, y * imageData.width + imageData.width - 1);
+  }
+
+  for (let index = 0; index < queue.length; index += 1) {
+    const pixel = queue[index];
+    if (visited[pixel] === 1) {
+      continue;
+    }
+
+    visited[pixel] = 1;
+    const dataIndex = pixel * 4;
+
+    if (!looksLikePaintedBackground(data, dataIndex)) {
+      continue;
+    }
+
+    data[dataIndex + 3] = 0;
+    const x = pixel % imageData.width;
+    const y = Math.floor(pixel / imageData.width);
+
+    if (x > 0) {
+      queue.push(pixel - 1);
+    }
+    if (x < imageData.width - 1) {
+      queue.push(pixel + 1);
+    }
+    if (y > 0) {
+      queue.push(pixel - imageData.width);
+    }
+    if (y < imageData.height - 1) {
+      queue.push(pixel + imageData.width);
+    }
+  }
+}
+
+function looksLikePaintedBackground(data: Uint8ClampedArray, index: number): boolean {
+  const red = data[index];
+  const green = data[index + 1];
+  const blue = data[index + 2];
+  const alpha = data[index + 3];
+  const max = Math.max(red, green, blue);
+  const min = Math.min(red, green, blue);
+
+  return (
+    alpha > 0 &&
+    max < 190 &&
+    max - min < EDGE_BACKGROUND_TOLERANCE &&
+    red > 65 &&
+    green > 55 &&
+    blue > 45
+  );
+}
+
+function keepLargestOpaqueComponent(imageData: ImageData): void {
+  const data = imageData.data;
+  const visited = new Uint8Array(imageData.width * imageData.height);
+  let largest: number[] = [];
+
+  for (let pixel = 0; pixel < visited.length; pixel += 1) {
+    if (visited[pixel] === 1 || data[pixel * 4 + 3] === 0) {
+      continue;
+    }
+
+    const component = collectOpaqueComponent(imageData, visited, pixel);
+    if (component.length > largest.length) {
+      largest = component;
+    }
+  }
+
+  const keep = new Set(largest);
+  for (let pixel = 0; pixel < visited.length; pixel += 1) {
+    if (!keep.has(pixel)) {
+      data[pixel * 4 + 3] = 0;
+    }
+  }
+}
+
+function collectOpaqueComponent(
+  imageData: ImageData,
+  visited: Uint8Array,
+  startPixel: number,
+): number[] {
+  const component: number[] = [];
+  const queue = [startPixel];
+
+  for (let index = 0; index < queue.length; index += 1) {
+    const pixel = queue[index];
+    if (visited[pixel] === 1 || imageData.data[pixel * 4 + 3] === 0) {
+      continue;
+    }
+
+    visited[pixel] = 1;
+    component.push(pixel);
+    const x = pixel % imageData.width;
+    const y = Math.floor(pixel / imageData.width);
+
+    if (x > 0) {
+      queue.push(pixel - 1);
+    }
+    if (x < imageData.width - 1) {
+      queue.push(pixel + 1);
+    }
+    if (y > 0) {
+      queue.push(pixel - imageData.width);
+    }
+    if (y < imageData.height - 1) {
+      queue.push(pixel + imageData.width);
+    }
+  }
+
+  return component;
 }
 
 function isDarkBackground(red: number, green: number, blue: number): boolean {
