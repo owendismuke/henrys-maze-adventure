@@ -25,6 +25,7 @@ interface SpriteSheetConfig {
   readonly frameHeight: number;
   readonly frameStrideX?: number;
   readonly columnSourceXs?: readonly number[];
+  readonly rowColumnSourceXs?: readonly (readonly number[] | undefined)[];
   readonly rowSourceYs?: readonly number[];
   readonly backgroundRemoval: BackgroundRemoval;
 }
@@ -46,6 +47,7 @@ const CHARACTER_SHEETS: Record<CharacterId, SpriteSheetConfig> = {
     frameWidth: 224,
     frameHeight: 204,
     columnSourceXs: [256, 544, 832, 1088],
+    rowColumnSourceXs: [[304, 544, 832, 1088]],
     backgroundRemoval: 'edge-connected',
   },
 };
@@ -107,7 +109,7 @@ export class SpriteSheet {
 
     context.drawImage(
       this.image,
-      this.getSourceX(column),
+      this.getSourceX(column, row),
       this.getSourceY(row),
       this.config.frameWidth,
       this.config.frameHeight,
@@ -162,8 +164,9 @@ export class SpriteSheet {
     return frame;
   }
 
-  private getSourceX(column: number): number {
+  private getSourceX(column: number, row: number): number {
     return (
+      this.config.rowColumnSourceXs?.[row]?.[column] ??
       this.config.columnSourceXs?.[column] ??
       this.config.sourceX + column * (this.config.frameStrideX ?? this.config.frameWidth)
     );
@@ -184,6 +187,7 @@ export function createCharacterSpriteSheets(onLoad: () => void): Record<Characte
 function removeBackground(imageData: ImageData, mode: BackgroundRemoval): void {
   if (mode === 'dark') {
     removeDarkBackground(imageData);
+    removeSmallOpaqueComponents(imageData);
     return;
   }
 

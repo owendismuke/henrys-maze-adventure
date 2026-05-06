@@ -22,6 +22,7 @@ Original prompt: Build a complete, running MVP of a web-based maze game from an 
 - Verified the updated Henry sheet still fits the current crop boundaries and increased Henry render scale above Tofu.
 - Rechecked the updated Henry package and fixed Tofu sprite frame extraction for right-tail, left-face, and inconsistent down-frame artifacts.
 - Fixed Henry's updated sheet extraction so side-motion heads are not clipped and movement directions render closer to the idle size.
+- Removed Henry walking-frame flecks and widened Tofu's loafing idle crop so the back of the cat is visible.
 
 ## TODO
 
