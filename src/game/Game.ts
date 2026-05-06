@@ -64,6 +64,7 @@ export class Game {
         cellSize: this.maze.cellSize,
         start: this.maze.start,
         goal: this.maze.goal,
+        tiles: this.maze.tiles,
       },
       player: this.player.circle,
     });

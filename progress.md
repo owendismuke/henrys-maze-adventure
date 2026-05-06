@@ -11,8 +11,10 @@ Original prompt: Build a complete, running MVP of a web-based maze game from an 
 - Added circle-vs-rectangle wall collision with axis-separated movement.
 - Added goal overlap win detection, win state overlay, keyboard restart, and restart button.
 - Added Vitest coverage for maze generation/validation and collision, and corrected solution-length constraints to rendered tile steps.
+- Added README with install, run, build, preview, test, controls, limitations, and future ideas.
+- Browser client rendered screenshots and state successfully with no console errors; added tile grid to debug state for complete solve-path verification.
+- Final verification passed: npm install, npm test, npm run build, npm run preview startup, browser screenshot/state client, and complete solve-flow Playwright script.
 
 ## TODO
 
-- Verify and commit validation tests.
-- Implement README and final verification.
+- No known blocking TODOs.
