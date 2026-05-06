@@ -141,7 +141,15 @@ export class Renderer {
 
 function getPlayerSpriteScale(player: PlayerRenderState): number {
   if (player.character === 'henry') {
-    return 5.4;
+    if (!player.isMoving) {
+      return 5.4;
+    }
+
+    if (player.facing === 'up' || player.facing === 'down') {
+      return 5.7;
+    }
+
+    return 5.25;
   }
 
   if (!player.isMoving) {

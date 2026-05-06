@@ -21,3 +21,4 @@
 - Keep Tofu idle scale independent of the last facing direction. Up/down movement needs a larger active walking scale, but idle should always return to the same size as side/idle poses.
 - Render Henry larger than Tofu. The updated Henry sheet still uses the same frame boundaries, but the human child sprite should read taller than the cat while sharing the same collision circle.
 - Track Tofu frame x positions explicitly instead of deriving every frame from a uniform stride. The source sheet has labels, props, and uneven spacing; explicit origins plus component filtering prevent tail/face clipping and avoid adjacent-frame artifacts.
+- Track Henry row y positions explicitly and scale Henry by movement direction. The updated sheet no longer aligns cleanly to uniform row starts; left/right need taller source crops to preserve the head, while up/down need a modest render boost and side poses need a slight reduction to match the current idle size.

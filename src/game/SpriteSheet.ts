@@ -25,6 +25,7 @@ interface SpriteSheetConfig {
   readonly frameHeight: number;
   readonly frameStrideX?: number;
   readonly columnSourceXs?: readonly number[];
+  readonly rowSourceYs?: readonly number[];
   readonly backgroundRemoval: BackgroundRemoval;
 }
 
@@ -35,6 +36,7 @@ const CHARACTER_SHEETS: Record<CharacterId, SpriteSheetConfig> = {
     sourceY: 0,
     frameWidth: 224,
     frameHeight: 204,
+    rowSourceYs: [0, 204, 400, 580, 760],
     backgroundRemoval: 'dark',
   },
   tofu: {
@@ -106,7 +108,7 @@ export class SpriteSheet {
     context.drawImage(
       this.image,
       this.getSourceX(column),
-      this.config.sourceY + row * this.config.frameHeight,
+      this.getSourceY(row),
       this.config.frameWidth,
       this.config.frameHeight,
       0,
@@ -165,6 +167,10 @@ export class SpriteSheet {
       this.config.columnSourceXs?.[column] ??
       this.config.sourceX + column * (this.config.frameStrideX ?? this.config.frameWidth)
     );
+  }
+
+  private getSourceY(row: number): number {
+    return this.config.rowSourceYs?.[row] ?? this.config.sourceY + row * this.config.frameHeight;
   }
 }
 
