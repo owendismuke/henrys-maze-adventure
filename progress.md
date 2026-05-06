@@ -9,8 +9,9 @@ Original prompt: Build a complete, running MVP of a web-based maze game from an 
 - Added Canvas 2D renderer and wired initial static maze view into the app.
 - Added held-key WASD/arrow input, normalized continuous player movement, and browser automation state/time hooks.
 - Added circle-vs-rectangle wall collision with axis-separated movement.
+- Added goal overlap win detection, win state overlay, keyboard restart, and restart button.
 
 ## TODO
 
-- Verify and commit collision.
-- Implement win/restart, validation tests, README, and final verification.
+- Verify and commit win/restart.
+- Implement validation tests, README, and final verification.

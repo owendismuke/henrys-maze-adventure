@@ -7,6 +7,11 @@ import { Renderer } from './Renderer';
 import type { Maze } from './types';
 
 const PLAYER_RADIUS_RATIO = 0.24;
+const GOAL_RADIUS_RATIO = 0.28;
+
+export interface GameStateSnapshot {
+  readonly hasWon: boolean;
+}
 
 export class Game {
   private readonly input = new Input();
@@ -17,7 +22,10 @@ export class Game {
   private animationFrame = 0;
   private lastFrameTime = performance.now();
 
-  constructor(canvas: HTMLCanvasElement) {
+  constructor(
+    canvas: HTMLCanvasElement,
+    private readonly onStateChange: (snapshot: GameStateSnapshot) => void = () => undefined,
+  ) {
     this.renderer = new Renderer(canvas);
     this.maze = new MazeGenerator().generate();
     this.player = this.createPlayerAtStart();
@@ -78,11 +86,19 @@ export class Game {
   };
 
   private update(deltaSeconds: number): void {
+    if (this.hasWon) {
+      if (this.input.consumeRestart()) {
+        this.restart();
+      }
+      return;
+    }
+
     const movement = this.input.getMovementVector();
     const delta = this.player.getMovementDelta(movement, deltaSeconds);
     this.player.setCircle(
       Collision.moveWithWalls(this.player.circle, this.maze, delta.x, delta.y),
     );
+    this.checkWin();
   }
 
   private createPlayerAtStart(): Player {
@@ -92,5 +108,34 @@ export class Game {
       y: center.y,
       radius: this.maze.cellSize * PLAYER_RADIUS_RATIO,
     });
+  }
+
+  restart(): void {
+    this.maze = new MazeGenerator().generate();
+    this.player = this.createPlayerAtStart();
+    this.setWon(false);
+    this.render();
+  }
+
+  private checkWin(): void {
+    const goalCenter = gridToWorldCenter(this.maze.goal, this.maze.cellSize);
+    const goalRadius = this.maze.cellSize * GOAL_RADIUS_RATIO;
+    const distance = Math.hypot(
+      this.player.circle.x - goalCenter.x,
+      this.player.circle.y - goalCenter.y,
+    );
+
+    if (distance <= this.player.circle.radius + goalRadius) {
+      this.setWon(true);
+    }
+  }
+
+  private setWon(hasWon: boolean): void {
+    if (this.hasWon === hasWon) {
+      return;
+    }
+
+    this.hasWon = hasWon;
+    this.onStateChange({ hasWon });
   }
 }

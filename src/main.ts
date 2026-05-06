@@ -13,11 +13,25 @@ canvas.id = 'game-canvas';
 canvas.setAttribute('aria-label', 'Top-down maze game canvas');
 canvas.tabIndex = 0;
 
-app.append(canvas);
+const restartButton = document.createElement('button');
+restartButton.id = 'restart-button';
+restartButton.type = 'button';
+restartButton.textContent = 'Restart';
+restartButton.hidden = true;
 
-const game = new Game(canvas);
+app.append(canvas);
+app.append(restartButton);
+
+const game = new Game(canvas, ({ hasWon }) => {
+  restartButton.hidden = !hasWon;
+});
 game.start();
 canvas.focus();
+
+restartButton.addEventListener('click', () => {
+  game.restart();
+  canvas.focus();
+});
 
 const mazeWindow = window as Window & MazeGameWindow;
 mazeWindow.render_game_to_text = () => game.renderGameToText();

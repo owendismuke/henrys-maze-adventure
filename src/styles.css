@@ -27,6 +27,7 @@ body {
 #app {
   display: grid;
   place-items: center;
+  position: relative;
 }
 
 #game-canvas {
@@ -34,4 +35,25 @@ body {
   width: 100vw;
   height: 100vh;
   outline: none;
+}
+
+#restart-button {
+  position: absolute;
+  left: 50%;
+  top: calc(50% + 78px);
+  transform: translateX(-50%);
+  min-width: 112px;
+  min-height: 42px;
+  border: 2px solid #fff;
+  border-radius: 6px;
+  background: #000;
+  color: #fff;
+  font: 700 1rem system-ui, sans-serif;
+  cursor: pointer;
+}
+
+#restart-button:hover,
+#restart-button:focus-visible {
+  background: #fff;
+  color: #000;
 }
