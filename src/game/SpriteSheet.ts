@@ -23,6 +23,8 @@ interface SpriteSheetConfig {
   readonly sourceY: number;
   readonly frameWidth: number;
   readonly frameHeight: number;
+  readonly frameStrideX?: number;
+  readonly columnSourceXs?: readonly number[];
   readonly backgroundRemoval: BackgroundRemoval;
 }
 
@@ -37,10 +39,11 @@ const CHARACTER_SHEETS: Record<CharacterId, SpriteSheetConfig> = {
   },
   tofu: {
     url: tofuSpriteUrl,
-    sourceX: 320,
+    sourceX: 256,
     sourceY: 0,
-    frameWidth: 256,
+    frameWidth: 224,
     frameHeight: 204,
+    columnSourceXs: [256, 544, 832, 1088],
     backgroundRemoval: 'edge-connected',
   },
 };
@@ -102,7 +105,7 @@ export class SpriteSheet {
 
     context.drawImage(
       this.image,
-      this.config.sourceX + column * this.config.frameWidth,
+      this.getSourceX(column),
       this.config.sourceY + row * this.config.frameHeight,
       this.config.frameWidth,
       this.config.frameHeight,
@@ -156,6 +159,13 @@ export class SpriteSheet {
     this.frameCache.set(cacheKey, frame);
     return frame;
   }
+
+  private getSourceX(column: number): number {
+    return (
+      this.config.columnSourceXs?.[column] ??
+      this.config.sourceX + column * (this.config.frameStrideX ?? this.config.frameWidth)
+    );
+  }
 }
 
 export function createCharacterSpriteSheets(onLoad: () => void): Record<CharacterId, SpriteSheet> {
@@ -172,7 +182,7 @@ function removeBackground(imageData: ImageData, mode: BackgroundRemoval): void {
   }
 
   removeEdgeConnectedBackground(imageData);
-  keepLargestOpaqueComponent(imageData);
+  removeSmallOpaqueComponents(imageData);
 }
 
 function removeDarkBackground(imageData: ImageData): void {
@@ -255,10 +265,12 @@ function looksLikePaintedBackground(data: Uint8ClampedArray, index: number): boo
   );
 }
 
-function keepLargestOpaqueComponent(imageData: ImageData): void {
+function removeSmallOpaqueComponents(imageData: ImageData): void {
+  const minComponentPixels = 90;
+  const rightArtifactStart = Math.floor(imageData.width * 0.62);
+  const labelBottom = Math.floor(imageData.height * 0.34);
   const data = imageData.data;
   const visited = new Uint8Array(imageData.width * imageData.height);
-  let largest: number[] = [];
 
   for (let pixel = 0; pixel < visited.length; pixel += 1) {
     if (visited[pixel] === 1 || data[pixel * 4 + 3] === 0) {
@@ -266,15 +278,15 @@ function keepLargestOpaqueComponent(imageData: ImageData): void {
     }
 
     const component = collectOpaqueComponent(imageData, visited, pixel);
-    if (component.length > largest.length) {
-      largest = component;
-    }
-  }
-
-  const keep = new Set(largest);
-  for (let pixel = 0; pixel < visited.length; pixel += 1) {
-    if (!keep.has(pixel)) {
-      data[pixel * 4 + 3] = 0;
+    if (
+      component.pixels.length < minComponentPixels ||
+      component.minX > rightArtifactStart ||
+      (component.maxY < labelBottom && component.height < 36) ||
+      (component.height < 36 && component.averageBrightness < 90)
+    ) {
+      for (const componentPixel of component.pixels) {
+        data[componentPixel * 4 + 3] = 0;
+      }
     }
   }
 }
@@ -283,9 +295,19 @@ function collectOpaqueComponent(
   imageData: ImageData,
   visited: Uint8Array,
   startPixel: number,
-): number[] {
-  const component: number[] = [];
+): {
+  readonly pixels: number[];
+  readonly minX: number;
+  readonly maxY: number;
+  readonly height: number;
+  readonly averageBrightness: number;
+} {
+  const pixels: number[] = [];
   const queue = [startPixel];
+  let minX = imageData.width;
+  let minY = imageData.height;
+  let maxY = -1;
+  let brightness = 0;
 
   for (let index = 0; index < queue.length; index += 1) {
     const pixel = queue[index];
@@ -294,9 +316,18 @@ function collectOpaqueComponent(
     }
 
     visited[pixel] = 1;
-    component.push(pixel);
+    pixels.push(pixel);
+    const dataIndex = pixel * 4;
+    brightness += Math.max(
+      imageData.data[dataIndex],
+      imageData.data[dataIndex + 1],
+      imageData.data[dataIndex + 2],
+    );
     const x = pixel % imageData.width;
     const y = Math.floor(pixel / imageData.width);
+    minX = Math.min(minX, x);
+    minY = Math.min(minY, y);
+    maxY = Math.max(maxY, y);
 
     if (x > 0) {
       queue.push(pixel - 1);
@@ -312,7 +343,13 @@ function collectOpaqueComponent(
     }
   }
 
-  return component;
+  return {
+    pixels,
+    minX,
+    maxY,
+    height: maxY - minY + 1,
+    averageBrightness: brightness / pixels.length,
+  };
 }
 
 function isDarkBackground(red: number, green: number, blue: number): boolean {
