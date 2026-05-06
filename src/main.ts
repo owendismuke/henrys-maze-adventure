@@ -1,5 +1,6 @@
 import './styles.css';
 import { Game } from './game/Game';
+import type { MazeGameWindow } from './game/windowTypes';
 
 const app = document.querySelector<HTMLDivElement>('#app');
 
@@ -17,3 +18,7 @@ app.append(canvas);
 const game = new Game(canvas);
 game.start();
 canvas.focus();
+
+const mazeWindow = window as Window & MazeGameWindow;
+mazeWindow.render_game_to_text = () => game.renderGameToText();
+mazeWindow.advanceTime = (milliseconds: number) => game.advanceTime(milliseconds);
