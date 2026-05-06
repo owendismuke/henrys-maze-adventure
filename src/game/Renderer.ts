@@ -141,7 +141,7 @@ export class Renderer {
 
 function getPlayerSpriteScale(player: PlayerRenderState): number {
   if (player.character === 'henry') {
-    return 3.8;
+    return 5.4;
   }
 
   if (!player.isMoving) {

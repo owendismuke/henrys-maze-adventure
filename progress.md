@@ -19,6 +19,7 @@ Original prompt: Build a complete, running MVP of a web-based maze game from an 
 - Added Tofu as a second selectable character using `sprites/tofu.png`; selection changes rendering only.
 - Adjusted Tofu up/down render scale so front/back poses visually match the larger side/idle poses.
 - Fixed Tofu idle scaling so releasing up/down returns to the same idle size as releasing left/right.
+- Verified the updated Henry sheet still fits the current crop boundaries and increased Henry render scale above Tofu.
 
 ## TODO
 
