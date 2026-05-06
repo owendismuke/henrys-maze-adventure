@@ -19,8 +19,10 @@ export class MazeValidator {
     const dimensionsValid =
       maze.width === this.config.cellColumns * 2 + 1 &&
       maze.height === this.config.cellRows * 2 + 1 &&
-      this.config.cellColumns <= 9 &&
-      this.config.cellRows <= 9;
+      this.config.cellColumns >= 2 &&
+      this.config.cellRows >= 2 &&
+      this.config.cellColumns <= 12 &&
+      this.config.cellRows <= 12;
     const startGoalDistance =
       Math.abs(maze.start.x - maze.goal.x) + Math.abs(maze.start.y - maze.goal.y);
     const startGoalValid =
@@ -36,6 +38,7 @@ export class MazeValidator {
       startGoalValid &&
       solutionLength >= this.config.minSolutionLength &&
       solutionLength <= this.config.maxSolutionLength &&
+      deadEnds >= this.config.minDeadEnds &&
       deadEnds <= this.config.maxDeadEnds;
 
     return {

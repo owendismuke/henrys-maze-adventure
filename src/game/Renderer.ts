@@ -14,6 +14,7 @@ const COLORS = {
   goal: '#20c763',
   text: '#ffffff',
 } as const;
+const MIN_BOARD_TOP_OFFSET = 72;
 
 export class Renderer {
   private readonly context: CanvasRenderingContext2D;
@@ -60,7 +61,11 @@ export class Renderer {
 
   private computeBoardOffset(maze: Maze): void {
     this.boardOffsetX = Math.floor((this.canvas.width - mazePixelWidth(maze)) / 2);
-    this.boardOffsetY = Math.floor((this.canvas.height - mazePixelHeight(maze)) / 2);
+    const centeredY = Math.floor((this.canvas.height - mazePixelHeight(maze)) / 2);
+    this.boardOffsetY =
+      mazePixelHeight(maze) + MIN_BOARD_TOP_OFFSET <= this.canvas.height
+        ? Math.max(centeredY, MIN_BOARD_TOP_OFFSET)
+        : centeredY;
   }
 
   private drawBackground(): void {

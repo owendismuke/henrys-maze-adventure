@@ -4,7 +4,7 @@
 
 1. Scaffold Vite, TypeScript, Vitest, base HTML/CSS, and git repository.
 2. Create product, architecture, task plan, and decision docs.
-3. Implement maze data structures, path-first generator, and validator.
+3. Implement maze data structures, perfect-maze generator, and validator.
 4. Implement canvas renderer for black background, white walls, player sprite, and green goal.
 5. Implement keyboard input and continuous player movement.
 6. Implement circle-vs-rectangle collision and wall blocking.
@@ -44,6 +44,6 @@
 - Goal is green and visible.
 - Player starts at the entrance.
 - Player cannot pass through walls or clip through corners.
-- Maze has a visually simple solution.
+- Maze has a visibly more complex 10 by 10 orthogonal layout with one correct solution.
 - "You win!" appears on goal reach.
 - `R`, `Enter`, and the restart button restart after winning.

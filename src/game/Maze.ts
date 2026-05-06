@@ -4,15 +4,14 @@ export const WALL: Tile = 1;
 export const FLOOR: Tile = 0;
 
 export const DEFAULT_MAZE_CONFIG = {
-  cellColumns: 7,
-  cellRows: 7,
-  tileSize: 36,
-  minSolutionLength: 19,
-  maxSolutionLength: 31,
-  maxDeadEnds: 7,
-  maxBranches: 5,
-  maxBranchLength: 2,
-  maxAttempts: 250,
+  cellColumns: 10,
+  cellRows: 10,
+  tileSize: 18,
+  minSolutionLength: 45,
+  maxSolutionLength: 150,
+  minDeadEnds: 8,
+  maxDeadEnds: 35,
+  maxAttempts: 500,
 } as const;
 
 export function createFilledTiles(width: number, height: number, tile: Tile): Tile[][] {

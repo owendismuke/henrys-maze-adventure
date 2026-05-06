@@ -4,7 +4,7 @@ import { MazeGenerator } from './MazeGenerator';
 import { MazeValidator } from './MazeValidator';
 
 describe('MazeGenerator', () => {
-  it('generates a solvable child-friendly maze for deterministic seeds', () => {
+  it('generates a solvable perfect maze with reference-style complexity for deterministic seeds', () => {
     const validator = new MazeValidator(DEFAULT_MAZE_CONFIG);
 
     for (let seed = 1; seed <= 20; seed += 1) {
@@ -18,6 +18,8 @@ describe('MazeGenerator', () => {
         startGoalValid: true,
         childFriendly: true,
       });
+      expect(maze.width).toBe(DEFAULT_MAZE_CONFIG.cellColumns * 2 + 1);
+      expect(maze.height).toBe(DEFAULT_MAZE_CONFIG.cellRows * 2 + 1);
       expect(validator.countPathsToGoal(maze)).toBe(1);
       expect(difficulty.solutionLength).toBeGreaterThanOrEqual(
         DEFAULT_MAZE_CONFIG.minSolutionLength,
@@ -25,6 +27,7 @@ describe('MazeGenerator', () => {
       expect(difficulty.solutionLength).toBeLessThanOrEqual(
         DEFAULT_MAZE_CONFIG.maxSolutionLength,
       );
+      expect(difficulty.deadEnds).toBeGreaterThanOrEqual(DEFAULT_MAZE_CONFIG.minDeadEnds);
       expect(difficulty.deadEnds).toBeLessThanOrEqual(DEFAULT_MAZE_CONFIG.maxDeadEnds);
     }
   });

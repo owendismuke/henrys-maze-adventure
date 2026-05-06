@@ -53,8 +53,7 @@ export interface MazeGenerationConfig {
   readonly tileSize: number;
   readonly minSolutionLength: number;
   readonly maxSolutionLength: number;
+  readonly minDeadEnds: number;
   readonly maxDeadEnds: number;
-  readonly maxBranches: number;
-  readonly maxBranchLength: number;
   readonly maxAttempts: number;
 }

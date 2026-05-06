@@ -57,28 +57,29 @@ The selected character is rendered as a sprite but still collides as a circle, a
 
 ## Maze Generation Strategy
 
-`MazeGenerator` uses a path-first generator:
+`MazeGenerator` uses randomized recursive backtracking to create a perfect orthogonal maze similar to the default rectangular style on MazeGenerator.net:
 
-1. Start at the entrance cell.
-2. Carve a guaranteed connected path to the exit using a biased random walk that always makes progress toward the goal often enough to stay short.
-3. Add a small number of short side branches from existing path cells.
-4. Track explicit carved edges between cells instead of connecting every adjacent carved cell.
-5. Convert walkable cells into a tile map with wall borders and open floor.
-6. Validate the result and retry with a different seed when constraints fail.
+1. Start near the top-center cell.
+2. Walk depth-first through unvisited neighboring cells.
+3. Carve exactly one parent edge when entering each unvisited cell.
+4. Bias neighbor ordering toward longer corridor flow, taking inspiration from MazeGenerator.net's river tendency setting.
+5. Convert the carved cell graph into a 21 by 21 tile map for a 10 by 10 logical maze.
+6. Open visual entrance and exit gaps in the top and bottom borders.
+7. Validate the result and retry with a different seed when constraints fail.
 
-Solvability is guaranteed by preserving the carved start-to-goal path. The explicit edge set keeps the maze graph tree-shaped, so side branches cannot create alternate routes. Validation still independently confirms that a path exists and that only one path reaches the goal.
+Solvability and uniqueness are guaranteed by the spanning-tree property: every logical cell is carved once, every new cell is connected to exactly one parent, and no loop edges are added. That means every cell is reachable and there is exactly one route between any two cells. Validation still independently confirms that a path exists and that only one path reaches the goal.
 
 ## Validation Strategy
 
 `MazeValidator` performs breadth-first search from start to goal and checks:
 
 - Start and goal are present and in bounds.
-- Dimensions are small.
+- Dimensions are within the supported compact range.
 - Start and goal are not adjacent.
 - A path exists.
 - Exactly one path reaches the goal.
-- Shortest solution length is within the child-friendly range.
+- Shortest solution length is within the reference-style range.
 - Solution length is measured in rendered tile steps, not carved cell count.
-- Dead-end count is below the configured cap.
+- Dead-end count is within the configured complexity range.
 
 Vitest tests cover maze validity, difficulty constraints, deterministic generation, and collision blocking.

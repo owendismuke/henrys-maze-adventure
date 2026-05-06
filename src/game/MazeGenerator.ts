@@ -41,79 +41,42 @@ export class MazeGenerator {
       }
     }
 
-    throw new Error('Unable to generate a child-friendly solvable maze.');
+    throw new Error('Unable to generate a valid perfect maze with the configured complexity.');
   }
 
   private generateCandidate(): Maze {
-    const cellStart = { x: 0, y: 0 };
-    const cellGoal = {
-      x: this.config.cellColumns - 1,
-      y: this.config.cellRows - 1,
-    };
+    const cellStart = this.getStartCell();
     const carvedCells = new Set<string>();
     const carvedEdges: EdgeSet = new Set();
-    const solutionCells = this.createSolutionPath(cellStart, cellGoal);
 
-    for (const cell of solutionCells) {
-      carvedCells.add(cellKey(cell));
-    }
-
-    for (let index = 1; index < solutionCells.length; index += 1) {
-      carvedEdges.add(edgeKey(solutionCells[index - 1], solutionCells[index]));
-    }
-
-    this.addSideBranches(carvedCells, carvedEdges);
+    this.carvePerfectMaze(cellStart, carvedCells, carvedEdges);
 
     return this.toTileMaze(carvedCells, carvedEdges);
   }
 
-  private createSolutionPath(start: GridPoint, goal: GridPoint): GridPoint[] {
-    const path: GridPoint[] = [{ ...start }];
-    const visited = new Set<string>([cellKey(start)]);
-    let current = { ...start };
+  private carvePerfectMaze(
+    start: GridPoint,
+    carvedCells: Set<string>,
+    carvedEdges: EdgeSet,
+  ): void {
+    const stack: GridPoint[] = [{ ...start }];
+    carvedCells.add(cellKey(start));
 
-    while (current.x !== goal.x || current.y !== goal.y) {
-      const options = this.progressFirstDirections(current, goal).filter((direction) => {
-        const next = { x: current.x + direction.x, y: current.y + direction.y };
-        return this.isCellInBounds(next) && !visited.has(cellKey(next));
-      });
+    while (stack.length > 0) {
+      const current = stack[stack.length - 1];
+      const unvisitedNeighbors = this.riverBiasedDirections(current)
+        .map((direction) => ({ x: current.x + direction.x, y: current.y + direction.y }))
+        .filter((next) => this.isCellInBounds(next) && !carvedCells.has(cellKey(next)));
 
-      if (options.length === 0) {
-        throw new Error('Path-first generator reached a dead end.');
+      if (unvisitedNeighbors.length === 0) {
+        stack.pop();
+        continue;
       }
 
-      const direction = this.pick(options);
-      current = { x: current.x + direction.x, y: current.y + direction.y };
-      visited.add(cellKey(current));
-      path.push({ ...current });
-    }
-
-    return path;
-  }
-
-  private addSideBranches(carvedCells: Set<string>, carvedEdges: EdgeSet): void {
-    const branchRoots = shuffle(
-      [...carvedCells].map(parseCellKey),
-      this.random,
-    ).slice(0, this.config.maxBranches);
-
-    for (const root of branchRoots) {
-      let current = root;
-      const branchLength = 1 + Math.floor(this.random() * this.config.maxBranchLength);
-
-      for (let step = 0; step < branchLength; step += 1) {
-        const options = shuffle([...CELL_DIRECTIONS], this.random)
-          .map((direction) => ({ x: current.x + direction.x, y: current.y + direction.y }))
-          .filter((next) => this.isCellInBounds(next) && !carvedCells.has(cellKey(next)));
-
-        if (options.length === 0) {
-          break;
-        }
-
-        carvedEdges.add(edgeKey(current, options[0]));
-        current = options[0];
-        carvedCells.add(cellKey(current));
-      }
+      const next = unvisitedNeighbors[0];
+      carvedEdges.add(edgeKey(current, next));
+      carvedCells.add(cellKey(next));
+      stack.push(next);
     }
   }
 
@@ -135,15 +98,17 @@ export class MazeGenerator {
       }
     }
 
-    const start = cellToTile({ x: 0, y: 0 });
-    const goal = cellToTile({
-      x: this.config.cellColumns - 1,
-      y: this.config.cellRows - 1,
-    });
+    const startCell = this.getStartCell();
+    const goalCell = this.getGoalCell();
+    const start = cellToTile(startCell);
+    const goal = cellToTile(goalCell);
+    tiles[0][start.x] = FLOOR;
+    tiles[height - 1][goal.x] = FLOOR;
 
-    // Only explicit carved edges become open connectors. Adjacent carved cells
-    // do not automatically connect, so the maze remains a tree with exactly one
-    // possible route from the entrance to the goal.
+    // Recursive backtracking carves each cell exactly once and only opens the
+    // connector to its parent cell. That produces a spanning tree: every cell is
+    // reachable, no isolated sections exist, and there is exactly one route
+    // between any two cells, including start and goal.
     return {
       width,
       height,
@@ -154,19 +119,36 @@ export class MazeGenerator {
     };
   }
 
-  private progressFirstDirections(current: GridPoint, goal: GridPoint): GridPoint[] {
-    const progress = CELL_DIRECTIONS.filter((direction) => {
+  private riverBiasedDirections(current: GridPoint): readonly GridPoint[] {
+    const goal = this.getGoalCell();
+    const shuffled = shuffle(CELL_DIRECTIONS, this.random);
+    const progress = shuffled.filter((direction) => {
       const next = { x: current.x + direction.x, y: current.y + direction.y };
-      const currentDistance = manhattan(current, goal);
-      return manhattan(next, goal) < currentDistance;
+      return manhattan(next, goal) < manhattan(current, goal);
     });
-    const detours = CELL_DIRECTIONS.filter((direction) => !progress.includes(direction));
+    const sideways = shuffled.filter((direction) => {
+      const next = { x: current.x + direction.x, y: current.y + direction.y };
+      return manhattan(next, goal) === manhattan(current, goal);
+    });
+    const retreat = shuffled.filter((direction) => {
+      const next = { x: current.x + direction.x, y: current.y + direction.y };
+      return manhattan(next, goal) > manhattan(current, goal);
+    });
 
-    return [...shuffle(progress, this.random), ...shuffle(detours, this.random)];
+    // MazeGenerator.net exposes a river setting for fewer, longer branches. A
+    // light directional bias keeps recursive backtracking corridor-like without
+    // making the solution as direct as the old path-first generator.
+    return this.random() < 0.58
+      ? [...progress, ...sideways, ...retreat]
+      : [...sideways, ...retreat, ...progress];
   }
 
-  private pick<T>(items: readonly T[]): T {
-    return items[Math.floor(this.random() * items.length)];
+  private getStartCell(): GridPoint {
+    return { x: Math.floor((this.config.cellColumns - 1) / 2), y: 0 };
+  }
+
+  private getGoalCell(): GridPoint {
+    return { x: Math.floor(this.config.cellColumns / 2), y: this.config.cellRows - 1 };
   }
 
   private isCellInBounds(cell: GridPoint): boolean {
