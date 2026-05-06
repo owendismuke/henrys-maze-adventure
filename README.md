@@ -2,7 +2,7 @@
 
 A browser-playable top-down maze game built with Vite, TypeScript, and plain Canvas 2D.
 
-The player can choose Henry or Tofu, the maze walls are white, the background is black, and the goal is green. Mazes are generated as compact 10 by 10 orthogonal perfect mazes with exactly one correct route, then validated with BFS and complexity constraints.
+The player can choose Henry or Tofu, the maze uses grassy walls and dirt paths from `sprites/main.png`, the background is black, and the goal is a door. Mazes are generated as compact 10 by 10 orthogonal perfect mazes with exactly one correct route, then validated with BFS and complexity constraints.
 
 ## Install
 
@@ -36,7 +36,7 @@ npm run preview
 npm test
 ```
 
-Tests cover deterministic maze validity, unique solution validation, reference-style complexity validation, circle-vs-rectangle collision, wall blocking, and sliding along walls.
+Tests cover deterministic maze validity, unique solution validation, reference-style complexity validation, stopwatch behavior, circle-vs-rectangle collision, wall blocking, and sliding along walls.
 
 ## Controls
 
@@ -48,17 +48,19 @@ Tests cover deterministic maze validity, unique solution validation, reference-s
 - Restart button: restart after winning
 - Henry / Tofu buttons: switch player character
 
+The stopwatch starts on first movement and stops when the player reaches the door.
+
 ## MVP Limitations
 
 - Single-player only.
 - Desktop keyboard controls only.
-- No sound, level selection, scoring, timer, persistence, or art beyond the local character sprite sheets.
+- No sound, level selection, scoring beyond the stopwatch, persistence, or art beyond the local sprite sheets.
 - Maze size and difficulty are fixed to a 10 by 10 logical perfect maze for the MVP.
 
 ## Future Improvements
 
 - Add optional easier/tutorial and slightly harder modes.
 - Add touch controls if mobile support becomes a goal.
-- Add a timer or star rating without making the MVP stressful.
+- Add star ratings or best-time persistence without making the MVP stressful.
 - Add a small level-selection screen backed by the same validator.
 - Add more browser-level tests for complete solve paths.

@@ -4,6 +4,7 @@ import { Input } from './Input';
 import { MazeGenerator } from './MazeGenerator';
 import { Player } from './Player';
 import { Renderer } from './Renderer';
+import { Stopwatch } from './Stopwatch';
 import type { CharacterId, FacingDirection, Maze } from './types';
 
 const PLAYER_RADIUS_RATIO = 0.24;
@@ -22,6 +23,7 @@ export class Game {
   private playerFacing: FacingDirection = 'down';
   private playerIsMoving = false;
   private animationSeconds = 0;
+  private readonly stopwatch = new Stopwatch();
   private hasWon = false;
   private animationFrame = 0;
   private lastFrameTime = performance.now();
@@ -77,6 +79,11 @@ export class Game {
         isMoving: this.playerIsMoving,
         animationSeconds: this.animationSeconds,
       },
+      timer: {
+        elapsedSeconds: this.stopwatch.getElapsedSeconds(),
+        display: this.stopwatch.format(),
+        state: this.stopwatch.getState(),
+      },
     });
   }
 
@@ -90,6 +97,8 @@ export class Game {
         isMoving: this.playerIsMoving,
         animationSeconds: this.animationSeconds,
       },
+      elapsedSeconds: this.stopwatch.getElapsedSeconds(),
+      timerState: this.stopwatch.getState(),
       hasWon: this.hasWon,
     });
   };
@@ -115,9 +124,12 @@ export class Game {
     this.playerIsMoving = Math.hypot(movement.x, movement.y) > 0;
 
     if (this.playerIsMoving) {
+      this.stopwatch.start();
       this.playerFacing = getFacingDirection(movement, this.playerFacing);
       this.animationSeconds += deltaSeconds;
     }
+
+    this.stopwatch.update(deltaSeconds);
 
     const delta = this.player.getMovementDelta(movement, deltaSeconds);
     this.player.setCircle(
@@ -141,6 +153,7 @@ export class Game {
     this.playerFacing = 'down';
     this.playerIsMoving = false;
     this.animationSeconds = 0;
+    this.stopwatch.reset();
     this.setWon(false);
     this.render();
   }
@@ -169,6 +182,9 @@ export class Game {
     }
 
     this.hasWon = hasWon;
+    if (hasWon) {
+      this.stopwatch.stop();
+    }
     this.onStateChange({ hasWon });
   }
 }

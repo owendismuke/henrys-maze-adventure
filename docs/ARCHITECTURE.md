@@ -25,8 +25,10 @@
       Maze.ts
       MazeGenerator.ts
       MazeValidator.ts
+      MainSpriteAtlas.ts
       Player.ts
       Renderer.ts
+      Stopwatch.ts
       types.ts
     styles.css
   docs/
@@ -39,13 +41,15 @@
 
 ## Game Loop Design
 
-`Game` owns the current maze, player, input, win state, and requestAnimationFrame loop. Each frame computes elapsed seconds, updates held-key movement, applies collision, checks the goal, and renders. A deterministic `window.advanceTime(ms)` hook advances fixed 60 FPS steps for browser automation.
+`Game` owns the current maze, player, input, stopwatch, win state, and requestAnimationFrame loop. Each frame computes elapsed seconds, starts the stopwatch on first movement, updates held-key movement, applies collision, checks the goal, stops the stopwatch on win, and renders. A deterministic `window.advanceTime(ms)` hook advances fixed 60 FPS steps for browser automation.
 
 ## Rendering Strategy
 
-`Renderer` draws the full game to one canvas. It computes a fixed logical board from maze dimensions and tile size, centers the board in the viewport, fills the canvas black, draws wall tiles white, draws the goal green, draws the selected character sprite, and overlays a simple win message.
+`Renderer` draws the full game to one canvas. It computes a fixed logical board from maze dimensions and tile size, centers the board in the viewport, fills the canvas black, draws dirt floor tiles, draws grassy wall connector sprites, draws the door goal, draws the selected character sprite, draws the timer HUD, and overlays spritesheet win text.
 
 `SpriteSheet` loads Henry and Tofu sprite sheets, crops the standing and walking frames using per-character sheet config, removes each sheet's source background, caches processed frames, and returns direction-aware frames for the renderer.
+
+`MainSpriteAtlas` loads `sprites/main.png`, caches named crop regions, and draws the grassy maze theme, door goal, timer panel, digit glyphs, and alphabet glyphs. It removes dark source-sheet background for cutout sprites while keeping floor textures raw.
 
 ## Input Handling
 

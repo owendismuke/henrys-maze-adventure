@@ -26,3 +26,5 @@
 - Replace the original 7 by 7 path-first generator with a 10 by 10 recursive-backtracking perfect maze. The new user direction prioritizes a more complex MazeGenerator.net-style orthogonal maze, while the spanning-tree generator preserves the single correct path requirement.
 - Keep the rendered board compact by reducing tile size to 18 pixels. A 10 by 10 logical maze renders to 21 by 21 tiles, so the board gains complexity without occupying the whole page or colliding with the character selector in the in-app browser.
 - Reserve a top offset for the centered maze board when viewport height allows it. This keeps the character selector from touching the denser 10 by 10 maze in smaller browser viewports.
+- Use `sprites/main.png` as a visual atlas for the maze, goal, timer, and canvas text. The selected theme is grassy walls with dirt paths because fully grassy walls and floors were too low-contrast in browser verification.
+- Keep the stopwatch deterministic and game-owned. It starts on first movement, advances through the existing update loop and `advanceTime`, stops on win, and resets on restart.

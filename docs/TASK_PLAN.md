@@ -5,7 +5,7 @@
 1. Scaffold Vite, TypeScript, Vitest, base HTML/CSS, and git repository.
 2. Create product, architecture, task plan, and decision docs.
 3. Implement maze data structures, perfect-maze generator, and validator.
-4. Implement canvas renderer for black background, white walls, player sprite, and green goal.
+4. Implement canvas renderer for black background, textured maze, player sprite, door goal, and timer HUD.
 5. Implement keyboard input and continuous player movement.
 6. Implement circle-vs-rectangle collision and wall blocking.
 7. Implement win detection, message, restart key, and restart button.
@@ -35,15 +35,16 @@
 - Browser automation verifies arrow-key movement changes player position.
 - Browser automation verifies wall collision blocks traversal.
 - Browser automation verifies win and restart flow.
+- Browser automation verifies timer starts on movement and stops on win.
 
 ## Manual QA Checklist
 
 - Maze appears on a black background.
-- Walls are white.
+- Walls use grassy spritesheet textures and paths use dirt texture.
 - Player is rendered from the selected Henry or Tofu sprite sheet.
-- Goal is green and visible.
+- Door goal is visible.
 - Player starts at the entrance.
 - Player cannot pass through walls or clip through corners.
 - Maze has a visibly more complex 10 by 10 orthogonal layout with one correct solution.
-- "You win!" appears on goal reach.
+- Spritesheet win text appears on goal reach.
 - `R`, `Enter`, and the restart button restart after winning.

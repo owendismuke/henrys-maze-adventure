@@ -2,14 +2,14 @@
 
 ## MVP Scope
 
-Build a single-player, browser-playable top-down maze game. The player selects Henry or Tofu, starts at the maze entrance, navigates white walls on a black background, reaches a visible green goal, wins, and can restart.
+Build a single-player, browser-playable top-down maze game. The player selects Henry or Tofu, starts at the maze entrance, navigates a textured maze on a black background, reaches a visible door goal, wins, and can restart.
 
 ## Non-Goals
 
 - Multiplayer
 - Accounts, persistence, leaderboards, analytics, or network play
 - Mobile touch controls
-- Sound, complex art beyond the provided character sprite sheets, external assets, or level editor
+- Sound, art beyond the local sprite sheets, external assets, or level editor
 - Procedurally difficult or adult puzzle mazes
 - React or a UI framework
 
@@ -29,7 +29,7 @@ The game should be immediately understandable. A child can see the maze, selecte
 
 ## Win Condition
 
-The player wins when the selected character overlaps the green goal at the exit. On win, the game displays "You win!" and supports restart by pressing `R`, `Enter`, or clicking the restart button.
+The player wins when the selected character overlaps the door at the exit. On win, the game displays spritesheet text for "YOU WIN" and supports restart by pressing `R`, `Enter`, or clicking the restart button.
 
 ## Controls
 
@@ -44,9 +44,9 @@ Holding movement keys continuously moves the player. Arrow key browser scrolling
 ## Visual Design
 
 - Full black canvas/page background
-- White maze walls only, with the maze board centered smaller than the page
+- Grassy maze walls and dirt floor path textures from `sprites/main.png`, with the maze board centered smaller than the page
 - Character selector for Henry or Tofu
 - Henry sprite from `sprites/henry.png`
 - Tofu sprite from `sprites/tofu.png`
-- Green circular goal
-- Minimal white text for win/restart state
+- Door goal, timer panel, stopwatch numbers, and bitmap win text from `sprites/main.png`
+- Stopwatch starts on first movement and stops when the player reaches the door

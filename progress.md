@@ -24,6 +24,7 @@ Original prompt: Build a complete, running MVP of a web-based maze game from an 
 - Fixed Henry's updated sheet extraction so side-motion heads are not clipped and movement directions render closer to the idle size.
 - Removed Henry walking-frame flecks and widened Tofu's loafing idle crop so the back of the cat is visible.
 - Replaced the simple path-first maze with a compact 10 by 10 recursive-backtracking perfect maze inspired by MazeGenerator.net's rectangular orthogonal style.
+- Applied `sprites/main.png` as the grassy/dirt maze atlas, door goal, bitmap timer HUD, spritesheet win text, and movement-driven stopwatch.
 
 ## TODO
 
