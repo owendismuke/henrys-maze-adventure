@@ -10,8 +10,9 @@ Original prompt: Build a complete, running MVP of a web-based maze game from an 
 - Added held-key WASD/arrow input, normalized continuous player movement, and browser automation state/time hooks.
 - Added circle-vs-rectangle wall collision with axis-separated movement.
 - Added goal overlap win detection, win state overlay, keyboard restart, and restart button.
+- Added Vitest coverage for maze generation/validation and collision, and corrected solution-length constraints to rendered tile steps.
 
 ## TODO
 
-- Verify and commit win/restart.
-- Implement validation tests, README, and final verification.
+- Verify and commit validation tests.
+- Implement README and final verification.

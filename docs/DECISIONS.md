@@ -11,3 +11,4 @@
 - Use continuous movement with axis-separated collision resolution. It feels responsive and naturally supports sliding along walls.
 - Use a fixed logical tile size with responsive canvas centering. This avoids resizing bugs while still fitting common desktop windows.
 - Add Vitest because maze validity and collision behavior are deterministic and practical to test.
+- Measure solution length in rendered tile steps. A 7 by 7 cell maze has connector tiles between cells, so the child-friendly accepted range is 19 to 31 rendered tile steps.

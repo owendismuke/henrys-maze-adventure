@@ -93,6 +93,7 @@ export class Game {
       return;
     }
 
+    this.input.consumeRestart();
     const movement = this.input.getMovementVector();
     const delta = this.player.getMovementDelta(movement, deltaSeconds);
     this.player.setCircle(

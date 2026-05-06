@@ -74,6 +74,7 @@ Solvability is guaranteed by preserving the carved start-to-goal path. Validatio
 - Start and goal are not adjacent.
 - A path exists.
 - Shortest solution length is within the child-friendly range.
+- Solution length is measured in rendered tile steps, not carved cell count.
 - Dead-end count is below the configured cap.
 
 Vitest tests cover maze validity, difficulty constraints, deterministic generation, and collision blocking.

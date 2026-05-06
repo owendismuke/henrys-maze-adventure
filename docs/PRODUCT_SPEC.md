@@ -20,9 +20,10 @@ The game should be immediately understandable. A child can see the maze, the pla
 ## First-Grader Difficulty Assumptions
 
 - Grid size stays small: 7 by 7 walkable cells.
-- The start and goal are not adjacent, but the solution path is short.
+- The start and goal are not adjacent, but the solution path is short for a 7 by 7 cell maze.
 - Side branches are limited and short.
 - Dead ends are capped to avoid frustration.
+- Difficulty length is measured in rendered tile steps, so the accepted shortest path range is 19 to 31 tile steps.
 - The generator validates every maze and retries if difficulty constraints are not met.
 
 ## Win Condition
