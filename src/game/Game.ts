@@ -73,6 +73,9 @@ export class Game {
       player: {
         ...this.player.circle,
         character: this.selectedCharacter,
+        facing: this.playerFacing,
+        isMoving: this.playerIsMoving,
+        animationSeconds: this.animationSeconds,
       },
     });
   }

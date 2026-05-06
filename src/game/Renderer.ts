@@ -110,7 +110,7 @@ export class Renderer {
       return;
     }
 
-    const targetHeight = player.radius * (player.character === 'tofu' ? 4.6 : 3.8);
+    const targetHeight = player.radius * getPlayerSpriteScale(player);
     const targetWidth = targetHeight * (frame.width / frame.height);
 
     this.context.imageSmoothingEnabled = false;
@@ -137,4 +137,12 @@ export class Renderer {
     this.context.font = '500 16px system-ui, sans-serif';
     this.context.fillText('Press R or Enter to restart', centerX, centerY + 24);
   }
+}
+
+function getPlayerSpriteScale(player: PlayerRenderState): number {
+  if (player.character === 'henry') {
+    return 3.8;
+  }
+
+  return player.facing === 'up' || player.facing === 'down' ? 6.4 : 4.6;
 }

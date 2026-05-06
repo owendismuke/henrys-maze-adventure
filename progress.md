@@ -17,6 +17,7 @@ Original prompt: Build a complete, running MVP of a web-based maze game from an 
 - Updated generator/validator so every generated maze has exactly one start-to-goal path, and removed the gray win overlay to preserve the black background.
 - Swapped blue-dot rendering for cached frames from `sprites/henry.png`; collision remains circle-based.
 - Added Tofu as a second selectable character using `sprites/tofu.png`; selection changes rendering only.
+- Adjusted Tofu up/down render scale so front/back poses visually match the larger side/idle poses.
 
 ## TODO
 
