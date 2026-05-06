@@ -29,6 +29,7 @@ export interface Maze {
 
 export interface MazeDifficulty {
   readonly hasPath: boolean;
+  readonly uniqueSolution: boolean;
   readonly solutionLength: number;
   readonly deadEnds: number;
   readonly dimensionsValid: boolean;

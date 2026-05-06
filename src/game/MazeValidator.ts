@@ -14,6 +14,7 @@ export class MazeValidator {
   validate(maze: Maze): MazeDifficulty {
     const solutionLength = this.shortestPathLength(maze);
     const hasPath = solutionLength > 0;
+    const uniqueSolution = this.countPathsToGoal(maze) === 1;
     const deadEnds = this.countDeadEnds(maze);
     const dimensionsValid =
       maze.width === this.config.cellColumns * 2 + 1 &&
@@ -30,6 +31,7 @@ export class MazeValidator {
       startGoalDistance > 2;
     const childFriendly =
       hasPath &&
+      uniqueSolution &&
       dimensionsValid &&
       startGoalValid &&
       solutionLength >= this.config.minSolutionLength &&
@@ -38,6 +40,7 @@ export class MazeValidator {
 
     return {
       hasPath,
+      uniqueSolution,
       solutionLength,
       deadEnds,
       dimensionsValid,
@@ -102,6 +105,51 @@ export class MazeValidator {
     }
 
     return deadEnds;
+  }
+
+  countPathsToGoal(maze: Maze): number {
+    if (!isInBounds(maze, maze.start) || !isInBounds(maze, maze.goal)) {
+      return 0;
+    }
+
+    return this.countPathsFrom(maze, maze.start, new Set<string>(), 0);
+  }
+
+  private countPathsFrom(
+    maze: Maze,
+    point: GridPoint,
+    visited: Set<string>,
+    foundPaths: number,
+  ): number {
+    if (foundPaths > 1) {
+      return foundPaths;
+    }
+
+    if (point.x === maze.goal.x && point.y === maze.goal.y) {
+      return foundPaths + 1;
+    }
+
+    visited.add(key(point));
+    let paths = foundPaths;
+
+    for (const offset of NEIGHBORS) {
+      const next = {
+        x: point.x + offset.x,
+        y: point.y + offset.y,
+      };
+
+      if (visited.has(key(next)) || isWall(maze, next)) {
+        continue;
+      }
+
+      paths = this.countPathsFrom(maze, next, visited, paths);
+      if (paths > 1) {
+        break;
+      }
+    }
+
+    visited.delete(key(point));
+    return paths;
   }
 }
 

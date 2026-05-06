@@ -13,7 +13,6 @@ const COLORS = {
   player: '#1e88ff',
   goal: '#20c763',
   text: '#ffffff',
-  overlay: 'rgba(0, 0, 0, 0.68)',
 } as const;
 
 export class Renderer {
@@ -114,8 +113,6 @@ export class Renderer {
     const centerX = this.boardOffsetX + boardWidth / 2;
     const centerY = this.boardOffsetY + boardHeight / 2;
 
-    this.context.fillStyle = COLORS.overlay;
-    this.context.fillRect(this.boardOffsetX, this.boardOffsetY, boardWidth, boardHeight);
     this.context.fillStyle = COLORS.text;
     this.context.textAlign = 'center';
     this.context.textBaseline = 'middle';

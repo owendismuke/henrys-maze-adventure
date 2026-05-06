@@ -13,10 +13,12 @@ describe('MazeGenerator', () => {
 
       expect(difficulty).toMatchObject({
         hasPath: true,
+        uniqueSolution: true,
         dimensionsValid: true,
         startGoalValid: true,
         childFriendly: true,
       });
+      expect(validator.countPathsToGoal(maze)).toBe(1);
       expect(difficulty.solutionLength).toBeGreaterThanOrEqual(
         DEFAULT_MAZE_CONFIG.minSolutionLength,
       );

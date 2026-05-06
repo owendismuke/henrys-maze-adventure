@@ -25,6 +25,7 @@ The game should be immediately understandable. A child can see the maze, the pla
 - Dead ends are capped to avoid frustration.
 - Difficulty length is measured in rendered tile steps, so the accepted shortest path range is 19 to 31 tile steps.
 - The generator validates every maze and retries if difficulty constraints are not met.
+- There is exactly one correct path from the start to the goal.
 
 ## Win Condition
 
@@ -42,8 +43,8 @@ Holding movement keys continuously moves the player. Arrow key browser scrolling
 
 ## Visual Design
 
-- Black canvas background
-- White maze walls
+- Full black canvas/page background
+- White maze walls only, with the maze board centered smaller than the page
 - Blue circular player
 - Green circular goal
 - Minimal white text for win/restart state

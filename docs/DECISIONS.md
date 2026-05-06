@@ -12,3 +12,5 @@
 - Use a fixed logical tile size with responsive canvas centering. This avoids resizing bugs while still fitting common desktop windows.
 - Add Vitest because maze validity and collision behavior are deterministic and practical to test.
 - Measure solution length in rendered tile steps. A 7 by 7 cell maze has connector tiles between cells, so the child-friendly accepted range is 19 to 31 rendered tile steps.
+- Preserve a single correct path by tracking explicit carved edges. Adjacent carved cells stay separated by walls unless the generator carved that exact edge, which prevents side branches from forming loops or alternate routes.
+- Remove the gray win overlay. The page and canvas should remain fully black except for white maze walls and required game elements/text.

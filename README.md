@@ -2,7 +2,7 @@
 
 A browser-playable top-down maze game built with Vite, TypeScript, and plain Canvas 2D.
 
-The player is a blue dot, the maze walls are white, the background is black, and the goal is green. Mazes are generated from a guaranteed start-to-goal path, then validated with BFS and child-friendly difficulty constraints.
+The player is a blue dot, the maze walls are white, the background is black, and the goal is green. Mazes are generated from a guaranteed start-to-goal path, kept to exactly one correct route, then validated with BFS and child-friendly difficulty constraints.
 
 ## Install
 
@@ -36,7 +36,7 @@ npm run preview
 npm test
 ```
 
-Tests cover deterministic maze validity, child-friendly difficulty validation, circle-vs-rectangle collision, wall blocking, and sliding along walls.
+Tests cover deterministic maze validity, unique solution validation, child-friendly difficulty validation, circle-vs-rectangle collision, wall blocking, and sliding along walls.
 
 ## Controls
 

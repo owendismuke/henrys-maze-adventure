@@ -3,6 +3,7 @@ import { MazeValidator } from './MazeValidator';
 import type { GridPoint, Maze, MazeGenerationConfig } from './types';
 
 type Random = () => number;
+type EdgeSet = Set<string>;
 
 const CELL_DIRECTIONS: readonly GridPoint[] = [
   { x: 1, y: 0 },
@@ -25,7 +26,14 @@ export class MazeGenerator {
 
   generate(): Maze {
     for (let attempt = 0; attempt < this.config.maxAttempts; attempt += 1) {
-      const maze = this.generateCandidate();
+      let maze: Maze;
+
+      try {
+        maze = this.generateCandidate();
+      } catch {
+        continue;
+      }
+
       const difficulty = this.validator.validate(maze);
 
       if (difficulty.childFriendly) {
@@ -43,15 +51,20 @@ export class MazeGenerator {
       y: this.config.cellRows - 1,
     };
     const carvedCells = new Set<string>();
+    const carvedEdges: EdgeSet = new Set();
     const solutionCells = this.createSolutionPath(cellStart, cellGoal);
 
     for (const cell of solutionCells) {
       carvedCells.add(cellKey(cell));
     }
 
-    this.addSideBranches(carvedCells);
+    for (let index = 1; index < solutionCells.length; index += 1) {
+      carvedEdges.add(edgeKey(solutionCells[index - 1], solutionCells[index]));
+    }
 
-    return this.toTileMaze(carvedCells);
+    this.addSideBranches(carvedCells, carvedEdges);
+
+    return this.toTileMaze(carvedCells, carvedEdges);
   }
 
   private createSolutionPath(start: GridPoint, goal: GridPoint): GridPoint[] {
@@ -65,7 +78,11 @@ export class MazeGenerator {
         return this.isCellInBounds(next) && !visited.has(cellKey(next));
       });
 
-      const direction = options.length > 0 ? this.pick(options) : this.pickTowardGoal(current, goal);
+      if (options.length === 0) {
+        throw new Error('Path-first generator reached a dead end.');
+      }
+
+      const direction = this.pick(options);
       current = { x: current.x + direction.x, y: current.y + direction.y };
       visited.add(cellKey(current));
       path.push({ ...current });
@@ -74,7 +91,7 @@ export class MazeGenerator {
     return path;
   }
 
-  private addSideBranches(carvedCells: Set<string>): void {
+  private addSideBranches(carvedCells: Set<string>, carvedEdges: EdgeSet): void {
     const branchRoots = shuffle(
       [...carvedCells].map(parseCellKey),
       this.random,
@@ -93,13 +110,14 @@ export class MazeGenerator {
           break;
         }
 
+        carvedEdges.add(edgeKey(current, options[0]));
         current = options[0];
         carvedCells.add(cellKey(current));
       }
     }
   }
 
-  private toTileMaze(carvedCells: Set<string>): Maze {
+  private toTileMaze(carvedCells: Set<string>, carvedEdges: EdgeSet): Maze {
     const width = this.config.cellColumns * 2 + 1;
     const height = this.config.cellRows * 2 + 1;
     const tiles = createFilledTiles(width, height, 1);
@@ -111,7 +129,7 @@ export class MazeGenerator {
 
       for (const direction of CELL_DIRECTIONS) {
         const neighbor = { x: cell.x + direction.x, y: cell.y + direction.y };
-        if (carvedCells.has(cellKey(neighbor))) {
+        if (carvedEdges.has(edgeKey(cell, neighbor))) {
           tiles[tile.y + direction.y][tile.x + direction.x] = FLOOR;
         }
       }
@@ -123,8 +141,9 @@ export class MazeGenerator {
       y: this.config.cellRows - 1,
     });
 
-    // The carved solution cells are always connected before branches are added,
-    // so these entrance and exit tiles remain linked by construction.
+    // Only explicit carved edges become open connectors. Adjacent carved cells
+    // do not automatically connect, so the maze remains a tree with exactly one
+    // possible route from the entrance to the goal.
     return {
       width,
       height,
@@ -144,13 +163,6 @@ export class MazeGenerator {
     const detours = CELL_DIRECTIONS.filter((direction) => !progress.includes(direction));
 
     return [...shuffle(progress, this.random), ...shuffle(detours, this.random)];
-  }
-
-  private pickTowardGoal(current: GridPoint, goal: GridPoint): GridPoint {
-    const options = this.progressFirstDirections(current, goal).filter((direction) =>
-      this.isCellInBounds({ x: current.x + direction.x, y: current.y + direction.y }),
-    );
-    return this.pick(options);
   }
 
   private pick<T>(items: readonly T[]): T {
@@ -173,6 +185,10 @@ function cellToTile(cell: GridPoint): GridPoint {
 
 function cellKey(cell: GridPoint): string {
   return `${cell.x},${cell.y}`;
+}
+
+function edgeKey(a: GridPoint, b: GridPoint): string {
+  return [cellKey(a), cellKey(b)].sort().join('|');
 }
 
 function parseCellKey(key: string): GridPoint {
