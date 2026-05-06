@@ -144,5 +144,9 @@ function getPlayerSpriteScale(player: PlayerRenderState): number {
     return 3.8;
   }
 
+  if (!player.isMoving) {
+    return 4.6;
+  }
+
   return player.facing === 'up' || player.facing === 'down' ? 6.4 : 4.6;
 }
