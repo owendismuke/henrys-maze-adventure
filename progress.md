@@ -26,6 +26,7 @@ Original prompt: Build a complete, running MVP of a web-based maze game from an 
 - Replaced the simple path-first maze with a compact 10 by 10 recursive-backtracking perfect maze inspired by MazeGenerator.net's rectangular orthogonal style.
 - Applied `sprites/main.png` as the grassy/dirt maze atlas, door goal, timer HUD, win banner backing, and movement-driven stopwatch.
 - Fixed HUD layout and readability: character selector top-left, timer top-right, door below the maze exit, artifact-free timer text, and unclipped win banner.
+- Added responsive board render scaling so the top selector and timer reserve enough space and no longer overlap the maze in short in-app browser viewports.
 
 ## TODO
 

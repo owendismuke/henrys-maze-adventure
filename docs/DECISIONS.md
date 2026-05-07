@@ -31,3 +31,4 @@
 - Place the character selector in the top-left and the timer in the top-right. This separates the UI controls from each other and from the centered maze board.
 - Draw the door below the exit instead of on top of the maze. The collision goal remains at the exit tile, while the door is a visual destination just outside the board.
 - Use clean backed canvas text for the timer numerals and win banner. The sprite atlas glyph regions produced visible artifacts and clipping at the sizes needed in-game.
+- Scale the rendered board, player, and door down when the browser viewport is too short to fit both the HUD and full-size maze. This preserves collision math and maze complexity while guaranteeing the top-left selector and top-right timer do not overlap the board.

@@ -16,7 +16,8 @@ const COLORS = {
   background: '#000000',
 } as const;
 const UI_PADDING = 18;
-const MIN_BOARD_TOP_OFFSET = 94;
+const HUD_RESERVED_HEIGHT = 112;
+const MIN_BOARD_BOTTOM_PADDING = 18;
 const TIMER_PANEL_WIDTH = 146;
 const DOOR_SIZE_RATIO = 2.35;
 const DOOR_TOP_GAP = 4;
@@ -27,6 +28,7 @@ export class Renderer {
   private readonly mainAtlas: MainSpriteAtlas;
   private boardOffsetX = 0;
   private boardOffsetY = 0;
+  private renderScale = 1;
 
   constructor(
     private readonly canvas: HTMLCanvasElement,
@@ -68,13 +70,27 @@ export class Renderer {
   }
 
   private computeBoardOffset(maze: Maze): void {
-    this.boardOffsetX = Math.floor((this.canvas.width - mazePixelWidth(maze)) / 2);
-    const visualHeight = mazePixelHeight(maze) + maze.cellSize * DOOR_SIZE_RATIO + DOOR_TOP_GAP;
-    const centeredY = Math.floor((this.canvas.height - visualHeight) / 2);
-    this.boardOffsetY =
-      visualHeight + MIN_BOARD_TOP_OFFSET <= this.canvas.height
-        ? Math.max(centeredY, MIN_BOARD_TOP_OFFSET)
-        : centeredY;
+    const mazeWidth = mazePixelWidth(maze);
+    const mazeHeight = mazePixelHeight(maze);
+    const doorHeight = maze.cellSize * DOOR_SIZE_RATIO;
+    const visualHeight = mazeHeight + DOOR_TOP_GAP + doorHeight;
+    const availableHeight = Math.max(
+      1,
+      this.canvas.height - HUD_RESERVED_HEIGHT - MIN_BOARD_BOTTOM_PADDING,
+    );
+    const availableWidth = Math.max(1, this.canvas.width - UI_PADDING * 2);
+
+    // When the in-app browser is short, scale rendering down instead of letting
+    // the HUD overlap the top maze row. Gameplay and collision use unscaled
+    // maze coordinates; only the canvas presentation is scaled.
+    this.renderScale = Math.min(1, availableWidth / mazeWidth, availableHeight / visualHeight);
+
+    const scaledWidth = mazeWidth * this.renderScale;
+    const scaledHeight = visualHeight * this.renderScale;
+    this.boardOffsetX = Math.floor((this.canvas.width - scaledWidth) / 2);
+    this.boardOffsetY = Math.floor(
+      HUD_RESERVED_HEIGHT + Math.max(0, (availableHeight - scaledHeight) / 2),
+    );
   }
 
   private drawBackground(): void {
@@ -88,9 +104,9 @@ export class Renderer {
         if (maze.tiles[y][x] === 0) {
           this.mainAtlas.drawFloor(
             this.context,
-            this.boardOffsetX + x * maze.cellSize,
-            this.boardOffsetY + y * maze.cellSize,
-            maze.cellSize,
+            this.toCanvasX(x * maze.cellSize),
+            this.toCanvasY(y * maze.cellSize),
+            this.toCanvasSize(maze.cellSize),
           );
         }
       }
@@ -104,9 +120,9 @@ export class Renderer {
             this.context,
             wallSprite.kind,
             wallSprite.rotationRadians,
-            this.boardOffsetX + x * maze.cellSize,
-            this.boardOffsetY + y * maze.cellSize,
-            maze.cellSize,
+            this.toCanvasX(x * maze.cellSize),
+            this.toCanvasY(y * maze.cellSize),
+            this.toCanvasSize(maze.cellSize),
           );
         }
       }
@@ -117,9 +133,9 @@ export class Renderer {
     const center = gridToWorldCenter(maze.goal, maze.cellSize);
     this.mainAtlas.drawDoor(
       this.context,
-      this.boardOffsetX + center.x,
-      this.boardOffsetY + mazePixelHeight(maze) + DOOR_TOP_GAP,
-      maze.cellSize * DOOR_SIZE_RATIO,
+      this.toCanvasX(center.x),
+      this.toCanvasY(mazePixelHeight(maze) + DOOR_TOP_GAP),
+      this.toCanvasSize(maze.cellSize * DOOR_SIZE_RATIO),
     );
   }
 
@@ -134,14 +150,14 @@ export class Renderer {
       return;
     }
 
-    const targetHeight = player.radius * getPlayerSpriteScale(player);
+    const targetHeight = this.toCanvasSize(player.radius * getPlayerSpriteScale(player));
     const targetWidth = targetHeight * (frame.width / frame.height);
 
     this.context.imageSmoothingEnabled = false;
     this.context.drawImage(
       frame.image,
-      this.boardOffsetX + player.x - targetWidth / 2,
-      this.boardOffsetY + player.y - targetHeight * 0.72,
+      this.toCanvasX(player.x) - targetWidth / 2,
+      this.toCanvasY(player.y) - targetHeight * 0.72,
       targetWidth,
       targetHeight,
     );
@@ -159,10 +175,22 @@ export class Renderer {
   private drawWinOverlay(maze: Maze): void {
     const boardWidth = mazePixelWidth(maze);
     const boardHeight = mazePixelHeight(maze);
-    const centerX = this.boardOffsetX + boardWidth / 2;
-    const centerY = this.boardOffsetY + boardHeight / 2;
+    const centerX = this.toCanvasX(boardWidth / 2);
+    const centerY = this.toCanvasY(boardHeight / 2);
 
     this.mainAtlas.drawWinText(this.context, centerX, centerY);
+  }
+
+  private toCanvasX(worldX: number): number {
+    return this.boardOffsetX + worldX * this.renderScale;
+  }
+
+  private toCanvasY(worldY: number): number {
+    return this.boardOffsetY + worldY * this.renderScale;
+  }
+
+  private toCanvasSize(worldSize: number): number {
+    return worldSize * this.renderScale;
   }
 }
 

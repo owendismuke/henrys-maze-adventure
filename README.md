@@ -49,6 +49,7 @@ Tests cover deterministic maze validity, unique solution validation, reference-s
 - Henry / Tofu buttons: switch player character
 
 The stopwatch starts on first movement and stops when the player reaches the door.
+In short browser viewports, the maze board scales down so the top-left character selector and top-right timer remain clear of the play area.
 
 ## MVP Limitations
 

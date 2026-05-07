@@ -36,7 +36,7 @@
 - Browser automation verifies wall collision blocks traversal.
 - Browser automation verifies win and restart flow.
 - Browser automation verifies timer starts on movement and stops on win.
-- Browser automation verifies top-left selector, top-right timer, below-exit door, and unclipped win banner.
+- Browser automation verifies top-left selector, top-right timer, below-exit door, unclipped win banner, and no HUD overlap with the maze in short in-app browser viewports.
 
 ## Manual QA Checklist
 
