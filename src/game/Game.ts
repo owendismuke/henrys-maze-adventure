@@ -5,7 +5,7 @@ import { MAZE_THEME_SEQUENCE, type MazeThemeId } from './MainSpriteAtlas';
 import { MazeGenerator } from './MazeGenerator';
 import { Player } from './Player';
 import { Renderer } from './Renderer';
-import { Stopwatch } from './Stopwatch';
+import { Stopwatch, type TimerState } from './Stopwatch';
 import type { CharacterId, FacingDirection, Maze } from './types';
 
 const PLAYER_RADIUS_RATIO = 0.24;
@@ -166,6 +166,30 @@ export class Game {
   setCharacter(character: CharacterId): void {
     this.selectedCharacter = character;
     this.render();
+  }
+
+  getCharacter(): CharacterId {
+    return this.selectedCharacter;
+  }
+
+  getPortraitDataUrl(character: CharacterId): string | null {
+    return this.renderer.getPortraitDataUrl(character);
+  }
+
+  getElapsedSeconds(): number {
+    return this.stopwatch.getElapsedSeconds();
+  }
+
+  getTimerDisplay(): string {
+    return this.stopwatch.format();
+  }
+
+  getTimerState(): TimerState {
+    return this.stopwatch.getState();
+  }
+
+  isWon(): boolean {
+    return this.hasWon;
   }
 
   private getCurrentMazeTheme(): MazeThemeId {
