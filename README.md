@@ -2,6 +2,8 @@
 
 A browser-playable top-down maze game built with Vite, TypeScript, and plain Canvas 2D.
 
+Live site: https://henrysmazeadventure.com
+
 The player can choose Henry or Tofu, the maze uses cycling wall/floor themes from `sprites/main.png`, the background is black, and the goal is a door. Mazes are generated as compact 10 by 10 orthogonal perfect mazes with exactly one correct route, then validated with BFS and complexity constraints.
 
 ## Install
