@@ -1,6 +1,7 @@
 import { Collision } from './Collision';
 import { gridToWorldCenter } from './Maze';
 import { Input } from './Input';
+import { MAZE_THEME_SEQUENCE, type MazeThemeId } from './MainSpriteAtlas';
 import { MazeGenerator } from './MazeGenerator';
 import { Player } from './Player';
 import { Renderer } from './Renderer';
@@ -20,6 +21,7 @@ export class Game {
   private maze: Maze;
   private player: Player;
   private selectedCharacter: CharacterId = 'henry';
+  private mazeThemeIndex = 0;
   private playerFacing: FacingDirection = 'down';
   private playerIsMoving = false;
   private animationSeconds = 0;
@@ -68,6 +70,7 @@ export class Game {
         width: this.maze.width,
         height: this.maze.height,
         cellSize: this.maze.cellSize,
+        theme: this.getCurrentMazeTheme(),
         start: this.maze.start,
         goal: this.maze.goal,
         tiles: this.maze.tiles,
@@ -99,6 +102,7 @@ export class Game {
       },
       elapsedSeconds: this.stopwatch.getElapsedSeconds(),
       timerState: this.stopwatch.getState(),
+      mazeTheme: this.getCurrentMazeTheme(),
       hasWon: this.hasWon,
     });
   };
@@ -148,6 +152,7 @@ export class Game {
   }
 
   restart(): void {
+    this.advanceMazeTheme();
     this.maze = new MazeGenerator().generate();
     this.player = this.createPlayerAtStart();
     this.playerFacing = 'down';
@@ -161,6 +166,14 @@ export class Game {
   setCharacter(character: CharacterId): void {
     this.selectedCharacter = character;
     this.render();
+  }
+
+  private getCurrentMazeTheme(): MazeThemeId {
+    return MAZE_THEME_SEQUENCE[this.mazeThemeIndex];
+  }
+
+  private advanceMazeTheme(): void {
+    this.mazeThemeIndex = (this.mazeThemeIndex + 1) % MAZE_THEME_SEQUENCE.length;
   }
 
   private checkWin(): void {

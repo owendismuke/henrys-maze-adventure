@@ -44,7 +44,8 @@ Holding movement keys continuously moves the player. Arrow key browser scrolling
 ## Visual Design
 
 - Full black canvas/page background
-- Grassy maze walls and dirt floor path textures from `sprites/main.png`, with the maze board centered smaller than the page and scaled down in short browser viewports to stay clear of the top HUD
+- Maze wall and floor themes from `sprites/main.png`, with the maze board centered smaller than the page, scaled down in short browser viewports to stay clear of the top HUD, and scaled up within a capped range on large viewports for readability
+- New generated mazes cycle through grass, stone, brick, wood, ice, metal, and lava visual themes
 - Character selector for Henry or Tofu in the top-left corner
 - Henry sprite from `sprites/henry.png`
 - Tofu sprite from `sprites/tofu.png`

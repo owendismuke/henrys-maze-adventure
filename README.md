@@ -2,7 +2,7 @@
 
 A browser-playable top-down maze game built with Vite, TypeScript, and plain Canvas 2D.
 
-The player can choose Henry or Tofu, the maze uses grassy walls and dirt paths from `sprites/main.png`, the background is black, and the goal is a door. Mazes are generated as compact 10 by 10 orthogonal perfect mazes with exactly one correct route, then validated with BFS and complexity constraints.
+The player can choose Henry or Tofu, the maze uses cycling wall/floor themes from `sprites/main.png`, the background is black, and the goal is a door. Mazes are generated as compact 10 by 10 orthogonal perfect mazes with exactly one correct route, then validated with BFS and complexity constraints.
 
 ## Install
 
@@ -49,7 +49,8 @@ Tests cover deterministic maze validity, unique solution validation, reference-s
 - Henry / Tofu buttons: switch player character
 
 The stopwatch starts on first movement and stops when the player reaches the door.
-In short browser viewports, the maze board scales down so the top-left character selector and top-right timer remain clear of the play area.
+The maze board scales responsively within a capped range: it shrinks to stay clear of the top-left selector and top-right timer, and grows on larger windows while preserving black page margins.
+Each newly generated maze advances to the next visual theme: grass, stone, brick, wood, ice, metal, then lava.
 
 ## MVP Limitations
 

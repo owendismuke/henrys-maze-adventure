@@ -1,5 +1,5 @@
 import { gridToWorldCenter, mazePixelHeight, mazePixelWidth } from './Maze';
-import { MainSpriteAtlas, type WallSpriteKind } from './MainSpriteAtlas';
+import { MainSpriteAtlas, type MazeThemeId, type WallSpriteKind } from './MainSpriteAtlas';
 import { createCharacterSpriteSheets, type SpriteSheet } from './SpriteSheet';
 import type { TimerState } from './Stopwatch';
 import type { CharacterId, Maze, PlayerRenderState } from './types';
@@ -10,6 +10,7 @@ export interface RenderState {
   readonly hasWon: boolean;
   readonly elapsedSeconds: number;
   readonly timerState: TimerState;
+  readonly mazeTheme: MazeThemeId;
 }
 
 const COLORS = {
@@ -18,6 +19,8 @@ const COLORS = {
 const UI_PADDING = 18;
 const HUD_RESERVED_HEIGHT = 112;
 const MIN_BOARD_BOTTOM_PADDING = 18;
+const MIN_BOARD_SIDE_PADDING = 48;
+const MAX_RESPONSIVE_SCALE = 1.65;
 const TIMER_PANEL_WIDTH = 146;
 const DOOR_SIZE_RATIO = 2.35;
 const DOOR_TOP_GAP = 4;
@@ -49,7 +52,7 @@ export class Renderer {
     this.resizeCanvas();
     this.computeBoardOffset(state.maze);
     this.drawBackground();
-    this.drawMaze(state.maze);
+    this.drawMaze(state.maze, state.mazeTheme);
     this.drawGoal(state.maze);
     this.drawPlayer(state.player);
     this.drawTimer(state.elapsedSeconds);
@@ -78,12 +81,17 @@ export class Renderer {
       1,
       this.canvas.height - HUD_RESERVED_HEIGHT - MIN_BOARD_BOTTOM_PADDING,
     );
-    const availableWidth = Math.max(1, this.canvas.width - UI_PADDING * 2);
+    const availableWidth = Math.max(1, this.canvas.width - MIN_BOARD_SIDE_PADDING * 2);
 
     // When the in-app browser is short, scale rendering down instead of letting
-    // the HUD overlap the top maze row. Gameplay and collision use unscaled
-    // maze coordinates; only the canvas presentation is scaled.
-    this.renderScale = Math.min(1, availableWidth / mazeWidth, availableHeight / visualHeight);
+    // the HUD overlap the top maze row. In larger viewports, scale up only to a
+    // capped point so the board is readable without consuming the whole page.
+    // Gameplay and collision use unscaled maze coordinates; only presentation is scaled.
+    this.renderScale = Math.min(
+      MAX_RESPONSIVE_SCALE,
+      availableWidth / mazeWidth,
+      availableHeight / visualHeight,
+    );
 
     const scaledWidth = mazeWidth * this.renderScale;
     const scaledHeight = visualHeight * this.renderScale;
@@ -98,12 +106,13 @@ export class Renderer {
     this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
   }
 
-  private drawMaze(maze: Maze): void {
+  private drawMaze(maze: Maze, mazeTheme: MazeThemeId): void {
     for (let y = 0; y < maze.height; y += 1) {
       for (let x = 0; x < maze.width; x += 1) {
         if (maze.tiles[y][x] === 0) {
           this.mainAtlas.drawFloor(
             this.context,
+            mazeTheme,
             this.toCanvasX(x * maze.cellSize),
             this.toCanvasY(y * maze.cellSize),
             this.toCanvasSize(maze.cellSize),
@@ -119,6 +128,7 @@ export class Renderer {
           this.mainAtlas.drawWall(
             this.context,
             wallSprite.kind,
+            mazeTheme,
             wallSprite.rotationRadians,
             this.toCanvasX(x * maze.cellSize),
             this.toCanvasY(y * maze.cellSize),

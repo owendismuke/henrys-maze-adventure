@@ -45,11 +45,11 @@
 
 ## Rendering Strategy
 
-`Renderer` draws the full game to one canvas. It computes a fixed logical board from maze dimensions and tile size, reserves a top HUD band for the character selector and timer, and scales the board presentation down in short viewports so the HUD never overlaps the maze. Gameplay, collision, and win checks remain in unscaled maze coordinates. The renderer fills the canvas black, draws dirt floor tiles, draws grassy wall connector sprites, draws the door below the exit, draws the selected character sprite, draws the top-right timer HUD, and overlays a backed win banner.
+`Renderer` draws the full game to one canvas. It computes a fixed logical board from maze dimensions and tile size, reserves a top HUD band for the character selector and timer, scales the board presentation down in short viewports so the HUD never overlaps the maze, and scales up to a capped maximum in large viewports so the maze stays readable without occupying the whole page. Gameplay, collision, and win checks remain in unscaled maze coordinates. The renderer fills the canvas black, draws the current maze theme's floor tiles, draws matching wall connector sprites, draws the door below the exit, draws the selected character sprite, draws the top-right timer HUD, and overlays a backed win banner.
 
 `SpriteSheet` loads Henry and Tofu sprite sheets, crops the standing and walking frames using per-character sheet config, removes each sheet's source background, caches processed frames, and returns direction-aware frames for the renderer.
 
-`MainSpriteAtlas` loads `sprites/main.png`, caches named crop regions, and draws the grassy maze theme, door goal, and timer panel. Timer and win text use backed canvas text over sprite panels to avoid the clipping/artifact issues in the atlas glyph regions.
+`MainSpriteAtlas` loads `sprites/main.png`, caches named crop regions, and draws the maze theme, door goal, and timer panel. The map theme sequence cycles through grass, stone, brick, wood, ice, metal, and lava whenever a new maze is generated. Timer and win text use backed canvas text over sprite panels to avoid the clipping/artifact issues in the atlas glyph regions.
 
 ## Input Handling
 

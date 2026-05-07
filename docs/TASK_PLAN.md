@@ -37,15 +37,19 @@
 - Browser automation verifies win and restart flow.
 - Browser automation verifies timer starts on movement and stops on win.
 - Browser automation verifies top-left selector, top-right timer, below-exit door, unclipped win banner, and no HUD overlap with the maze in short in-app browser viewports.
+- Browser automation verifies the board scales up in larger viewports while preserving black page margins.
+- Browser automation verifies restarting to a newly generated maze advances to the next maze visual theme.
 
 ## Manual QA Checklist
 
 - Maze appears on a black background.
-- Walls use grassy spritesheet textures and paths use dirt texture.
+- Walls and paths use the current spritesheet maze theme.
+- Restarting to a new generated maze advances to a different visual theme.
 - Player is rendered from the selected Henry or Tofu sprite sheet.
 - Door goal is visible.
 - Player starts at the entrance.
 - Player cannot pass through walls or clip through corners.
 - Maze has a visibly more complex 10 by 10 orthogonal layout with one correct solution.
+- Maze remains readable in large viewports without occupying the full page.
 - Backed win banner appears on goal reach without clipping.
 - `R`, `Enter`, and the restart button restart after winning.

@@ -8,21 +8,77 @@ interface Crop {
 }
 
 export type WallSpriteKind = 'vertical' | 'horizontal' | 'corner' | 't' | 'cross' | 'solid';
+export type MazeThemeId = 'grass' | 'stone' | 'brick' | 'wood' | 'ice' | 'metal' | 'lava';
+
+interface WallThemeCrops {
+  readonly solid: Crop;
+  readonly vertical: Crop;
+  readonly horizontal: Crop;
+  readonly corner: Crop;
+  readonly t: Crop;
+  readonly cross: Crop;
+}
+
+interface MazeTheme {
+  readonly floor: Crop;
+  readonly walls: WallThemeCrops;
+}
 
 const DARK_BACKGROUND_THRESHOLD = 44;
 const BLUE_BACKGROUND_MARGIN = 24;
 
 const CROPS = {
   dirtFloor: { x: 665, y: 446, width: 76, height: 73 },
-  grassWallSolid: { x: 62, y: 486, width: 24, height: 74 },
-  grassWallVertical: { x: 62, y: 486, width: 24, height: 74 },
-  grassWallHorizontal: { x: 164, y: 487, width: 124, height: 30 },
-  grassWallCorner: { x: 304, y: 486, width: 54, height: 70 },
-  grassWallT: { x: 466, y: 486, width: 50, height: 70 },
-  grassWallCross: { x: 592, y: 486, width: 54, height: 70 },
+  grassFloor: { x: 665, y: 520, width: 76, height: 73 },
+  stoneFloor: { x: 923, y: 446, width: 76, height: 73 },
+  woodFloor: { x: 837, y: 594, width: 76, height: 73 },
+  iceFloor: { x: 923, y: 520, width: 76, height: 73 },
+  metalFloor: { x: 923, y: 594, width: 76, height: 73 },
+  lavaFloor: { x: 837, y: 668, width: 76, height: 73 },
   door: { x: 668, y: 1392, width: 50, height: 48 },
   timerPanel: { x: 678, y: 1446, width: 112, height: 42 },
 } as const satisfies Record<string, Crop>;
+
+export const MAZE_THEME_SEQUENCE: readonly MazeThemeId[] = [
+  'grass',
+  'stone',
+  'brick',
+  'wood',
+  'ice',
+  'metal',
+  'lava',
+];
+
+const THEMES: Record<MazeThemeId, MazeTheme> = {
+  grass: {
+    floor: CROPS.dirtFloor,
+    walls: createWallTheme(486),
+  },
+  stone: {
+    floor: CROPS.stoneFloor,
+    walls: createWallTheme(310),
+  },
+  brick: {
+    floor: CROPS.dirtFloor,
+    walls: createWallTheme(398),
+  },
+  wood: {
+    floor: CROPS.woodFloor,
+    walls: createWallTheme(574),
+  },
+  ice: {
+    floor: CROPS.iceFloor,
+    walls: createWallTheme(662),
+  },
+  metal: {
+    floor: CROPS.metalFloor,
+    walls: createWallTheme(750),
+  },
+  lava: {
+    floor: CROPS.lavaFloor,
+    walls: createWallTheme(838),
+  },
+};
 
 export class MainSpriteAtlas {
   private readonly image = new Image();
@@ -37,20 +93,29 @@ export class MainSpriteAtlas {
     };
   }
 
-  drawFloor(context: CanvasRenderingContext2D, x: number, y: number, size: number): void {
-    this.drawRaw(context, 'dirtFloor', CROPS.dirtFloor, x, y, size, size);
+  drawFloor(
+    context: CanvasRenderingContext2D,
+    themeId: MazeThemeId | undefined,
+    x: number,
+    y: number,
+    size: number,
+  ): void {
+    const theme = getTheme(themeId);
+    this.drawRaw(context, `floor-${theme.id}`, theme.floor, x, y, size, size);
   }
 
   drawWall(
     context: CanvasRenderingContext2D,
     kind: WallSpriteKind,
+    themeId: MazeThemeId | undefined,
     rotationRadians: number,
     x: number,
     y: number,
     size: number,
   ): void {
-    const crop = getWallCrop(kind);
-    this.drawCutout(context, `wall-${kind}`, crop, x, y, size, size, rotationRadians);
+    const theme = getTheme(themeId);
+    const crop = getWallCrop(theme.walls, kind);
+    this.drawCutout(context, `wall-${theme.id}-${kind}`, crop, x, y, size, size, rotationRadians);
   }
 
   drawDoor(context: CanvasRenderingContext2D, centerX: number, topY: number, size: number): void {
@@ -195,24 +260,40 @@ export class MainSpriteAtlas {
   }
 }
 
-function getWallCrop(kind: WallSpriteKind): Crop {
+function getTheme(themeId: MazeThemeId | undefined): MazeTheme & { readonly id: MazeThemeId } {
+  const id = themeId && THEMES[themeId] ? themeId : 'grass';
+  return { id, ...THEMES[id] };
+}
+
+function createWallTheme(rowY: number): WallThemeCrops {
+  return {
+    solid: { x: 62, y: rowY, width: 24, height: 74 },
+    vertical: { x: 62, y: rowY, width: 24, height: 74 },
+    horizontal: { x: 164, y: rowY + 1, width: 124, height: 30 },
+    corner: { x: 304, y: rowY, width: 54, height: 70 },
+    t: { x: 466, y: rowY, width: 50, height: 70 },
+    cross: { x: 592, y: rowY, width: 54, height: 70 },
+  };
+}
+
+function getWallCrop(theme: WallThemeCrops, kind: WallSpriteKind): Crop {
   if (kind === 'horizontal') {
-    return CROPS.grassWallHorizontal;
+    return theme.horizontal;
   }
   if (kind === 'corner') {
-    return CROPS.grassWallCorner;
+    return theme.corner;
   }
   if (kind === 't') {
-    return CROPS.grassWallT;
+    return theme.t;
   }
   if (kind === 'cross') {
-    return CROPS.grassWallCross;
+    return theme.cross;
   }
   if (kind === 'solid') {
-    return CROPS.grassWallSolid;
+    return theme.solid;
   }
 
-  return CROPS.grassWallVertical;
+  return theme.vertical;
 }
 
 function removeDarkBlueBackground(imageData: ImageData): void {

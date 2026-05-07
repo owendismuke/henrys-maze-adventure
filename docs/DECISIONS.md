@@ -32,3 +32,5 @@
 - Draw the door below the exit instead of on top of the maze. The collision goal remains at the exit tile, while the door is a visual destination just outside the board.
 - Use clean backed canvas text for the timer numerals and win banner. The sprite atlas glyph regions produced visible artifacts and clipping at the sizes needed in-game.
 - Scale the rendered board, player, and door down when the browser viewport is too short to fit both the HUD and full-size maze. This preserves collision math and maze complexity while guaranteeing the top-left selector and top-right timer do not overlap the board.
+- Cycle maze visual themes on restart/new maze generation instead of changing themes mid-map. This keeps a single map visually stable and makes the next generated map clearly distinct without touching maze rules or collision.
+- Cap responsive board upscaling at 1.65x. This makes the maze readable in wide browser windows while preserving the black surrounding space requested for the page.

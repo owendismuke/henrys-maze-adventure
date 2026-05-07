@@ -27,6 +27,8 @@ Original prompt: Build a complete, running MVP of a web-based maze game from an 
 - Applied `sprites/main.png` as the grassy/dirt maze atlas, door goal, timer HUD, win banner backing, and movement-driven stopwatch.
 - Fixed HUD layout and readability: character selector top-left, timer top-right, door below the maze exit, artifact-free timer text, and unclipped win banner.
 - Added responsive board render scaling so the top selector and timer reserve enough space and no longer overlap the maze in short in-app browser viewports.
+- Added map theme cycling so each newly generated maze advances through grass, stone, brick, wood, ice, metal, and lava visuals.
+- Increased responsive board scaling on large viewports with a capped maximum so the maze is more readable while retaining black margins.
 
 ## TODO
 
